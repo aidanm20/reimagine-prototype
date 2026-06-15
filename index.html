@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reimagine Renting — Ember</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ember/app.css">
+</head>
+<body>
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="side">
+    <div class="brand">
+      <div class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h14v-9"/><path d="M10 19v-5h4v5"/></svg></div>
+      <div class="bt">Reimagine Renting </div>
+    </div>
+    <div class="nav-label">Your search flow</div>
+    <nav class="steps" id="steps"></nav>
+    <div class="side-foot">
+      <div class="prog">
+        <div class="prog-top"><b id="progPct">25%</b><small id="progStep">1 of 4 steps</small></div>
+        <div class="track"><i id="progBar" style="width:25%"></i></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="content">
+      <div class="account-actions">
+        <button class="btn-ghost"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit profile</button>
+        <button class="iconbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i class="dot"></i></button>
+        <div class="avatar">JD</div>
+      </div>
+      <!-- ===== VIEW 1 — LISTINGS ===== -->
+      <section class="view show" id="v2">
+        <div class="vh">
+          <div>
+            <h1>Your 3 saved apartments</h1>
+   
+          </div>
+        </div>
+
+        <div class="grid g-3" id="listingCards"></div>
+
+        <div class="grid g-2" style="margin-top:18px;align-items:stretch;">
+          <!-- profile card (moved from scenario) -->
+          <div class="card pad">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+              <div class="avatar" style="width:52px;height:52px;font-size:18px;">JD</div>
+              <div style="flex:1;">
+                <h2 style="font-size:19px;font-weight:600;">Boston / Cambridge — First Apartment Search</h2>
+                <div style="color:var(--text-2);font-size:13px;margin-top:2px;">First-time / early-stage renter · moving for grad school or a new job</div>
+              </div>
+            </div> 
+            <dl class="dl">
+              <div class="row"><dt>Life context</dt><dd>Grad school / new job</dd></div>
+              <div class="row"><dt>Main destination</dt><dd>Kendall Sq / MIT / Central</dd></div>
+              <div class="row"><dt>Monthly take-home</dt><dd class="mono">$6,000</dd></div>
+              <div class="row"><dt>Comfortable rent</dt><dd class="mono">$1,900–$2,400</dd></div>
+              <div class="row"><dt>Apartment type</dt><dd>Studio or 1-bedroom</dd></div>
+              <div class="row"><dt>Filters applied</dt><dd>Rent · type · location</dd></div>
+            </dl>
+            <div class="callout blue" style="margin-top:16px;">
+              <div class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+              <div><h4>Sample data note</h4><p>Realistic sample listings based on real Boston area references for prototype testing. </p></div>
+            </div>
+          </div>
+
+          <!-- interactive map -->
+          <div class="card" style="overflow:hidden;display:flex;flex-direction:column;">
+            <div class="card-h" style="padding:18px 22px 14px;">
+              <div>
+                <h3 class="card-t">Where they sit</h3>
+                <p class="card-s">Your three saved places relative to the Kendall / MIT destination — a quick read on commute geography.</p>
+              </div>
+               
+            </div>
+            <div class="ph" id="mapBox" style="flex:1;min-height:300px;margin:0 16px 16px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4 6 2 5-2v14l-5 2-6-2-5 2V6Z"/><path d="M9 4v14M15 6v14"/></svg>
+              <span>Interactive map · 3 apartments + destination</span>
+              <span style="font-size:11px;color:var(--text-3);">add a Google Maps key in ember/app.js to enable</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-nav">
+          <button class="btn primary" onclick="go('v3')">Set my priorities<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </section>
+
+      <!-- ===== VIEW 2 — PRIORITIES ===== -->
+      <section class="view" id="v3">
+        <div class="vh">
+          <div>
+            <h1>Your real-life priorities</h1>
+            
+          </div>
+        </div>
+        <div class="q-grid">
+          <div id="qCol1"></div>
+          <div id="qCol2"></div>
+        </div>
+        <div class="footer-nav">
+          <button class="btn subtle" onclick="go('v2')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</button>
+          <button class="btn primary" onclick="go('v4')">See my comparison<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </section>
+
+      <!-- ===== VIEW 3 — COMPARISON ===== -->
+      <section class="view" id="v4">
+        <div class="vh">
+          <div>
+            <h1>Your personalized comparison</h1>
+             
+          </div>
+        </div>
+
+        <div class="card fit-card" id="fitGlanceCard">
+          <div class="card-h pad" style="padding:18px 22px 16px;border-bottom:1px solid var(--border);">
+            <div>
+              <h3 class="card-t">Fit at a glance</h3>
+              <p class="card-s">Here is how each of your listings scored.</p>
+            </div>
+            
+          </div>
+          <div id="fitGlance"></div>
+        </div>
+
+        <div class="cmp-tools">
+          <span class="pill star"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 20.5l1.4-6.8L2.2 9l6.9-.7Z"/></svg>Your priorities</span>
+          <span class="chip is-on" style="pointer-events:none;"><span class="tick">✓</span>Grocery access</span>
+          <span class="chip is-on" style="pointer-events:none;"><span class="tick">✓</span>Quiet environment</span>
+          <button class="btn sm subtle" style="margin-left:auto;" onclick="go('v3')">Change priorities</button>
+        </div>
+
+        <div class="cmp-wrap"><div class="cmp" id="cmpTable"></div></div>
+
+        <div class="footer-nav">
+          <button class="btn subtle" onclick="go('v3')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</button>
+          <button class="btn primary" onclick="go('v5')">See the trade-offs<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </section>
+
+      <!-- ===== VIEW 4 — TRADE-OFFS ===== -->
+      <section class="view" id="v5">
+        <div class="vh">
+          <div>
+            <h1>What each option reveals</h1>
+          
+          </div>
+        </div>
+
+        <div class="to-grid" id="toCards"></div>
+
+        <div class="card pad" style="margin-bottom:18px;">
+          <div class="sec-label" style="margin-bottom:4px;">Decision</div>
+          <h3 style="font-size:18px;font-weight:400;margin-bottom:14px;">After this comparison, what would you do with each option?</h3>
+          <div class="dec" id="decMatrix"></div>
+          <div style="margin-top:16px;">
+            
+          </div>
+        </div>
+
+         
+
+        <div class="footer-nav">
+          <button class="btn subtle" onclick="go('v4')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</button>
+           
+          <button class="btn primary" onclick="go('v2')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>Finish &amp; restart</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script src="ember/app.js"></script>
+</body>
+</html>
