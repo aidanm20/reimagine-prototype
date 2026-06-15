@@ -2,7 +2,7 @@
 (function(){
   /* Paste a Google Maps JS API key to enable the Step-1 map (pins for the
      3 apartments + destination). Leave "" to keep the static placeholder. */
-  const GOOGLE_MAPS_API_KEY = "";
+  const GOOGLE_MAPS_API_KEY = "AIzaSyBXm34BHWVKOt9KIIUywGBorj97YOZmQNQ";
 
   /* ---------------- icons ---------------- */
   const SVG = (p, sw=1.9, s=15) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
