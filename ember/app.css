@@ -160,6 +160,17 @@ a{ color:inherit; }
 .input-ph.tall{ min-height:74px; align-items:flex-start; }
 #mapBox.map-live{ padding:0; border:1px solid var(--border); background:#eef0f4; }
 #mapBox.map-live #gmap{ position:absolute; inset:0; border-radius:12px; overflow:hidden; }
+.map-commutes{ position:absolute; left:12px; right:12px; bottom:12px; z-index:2; display:grid; gap:7px;
+  max-width:360px; padding:12px; border:1px solid rgba(227,229,236,.92); border-radius:12px;
+  background:rgba(255,255,255,.94); box-shadow:var(--shadow); backdrop-filter:blur(6px); text-align:left; }
+.commute-title{ font-size:10.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--text-3); }
+.commute-row{ display:flex; align-items:center; gap:9px; min-width:0; }
+.commute-row .tag{ width:25px; height:25px; border-radius:8px; flex:none; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; color:#fff; background:linear-gradient(150deg, var(--g1), var(--g2)); }
+.commute-row div{ min-width:0; }
+.commute-row b{ display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; line-height:1.2; }
+.commute-row small{ display:block; color:var(--text-2); font-size:11.5px; line-height:1.25; }
+.commute-row.muted small{ color:var(--text-3); font-style:italic; }
 
 /* ====================== KPI TILES ====================== */
 .kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
@@ -327,4 +338,5 @@ a{ color:inherit; }
 @media(max-width:680px){
   .account-actions{ position:static; justify-content:flex-end; margin-bottom:18px; }
   .vh{ padding-right:0; }
+  .map-commutes{ max-width:none; top:auto; }
 }

@@ -203,9 +203,9 @@
       return `<div class="cl${you?' you':''}">${inner}</div>`;
     };
     let h=`<div class="ch corner"><span class="sec-label"> Listings</span></div>`;
-    HEADS.forEach(hd=>{ h+=`<div class="ch"><div class="ch-top"><span class="tag">${hd.tag}</span><div><h4>${hd.name}</h4><div class="ch-rent">${hd.rent}<small>/mo</small></div></div></div><span class="pill soft">${hd.best}</span></div>`; });
+    HEADS.forEach(hd=>{ h+=`<div class="ch"><div class="ch-top"><span class="tag">${hd.tag}</span><div><h4>${hd.name}</h4><div class="ch-rent">${hd.rent}<small>/mo</small></div></div></div></div>`; });
     h+=`<div class="seclab">Core fields</div>`;
-    CMP.core.forEach(r=>{ h+=`<div class="rl">${r.lab}${r.est?' <span class="est-tag">~est</span>':''}</div>`+r.v.map(c=>cell(c,false)).join(''); });
+    CMP.core.forEach(r=>{ h+=`<div class="rl">${r.lab}</div>`+r.v.map(c=>cell(c,false)).join(''); });
     h+=`<div class="seclab you">${star(12)}Your priorities</div>`;
     CMP.you.forEach(r=>{ h+=`<div class="rl you">${star(11)}${r.lab}</div>`+r.v.map(c=>cell(c,true)).join(''); });
     ct.innerHTML=h;
@@ -254,16 +254,63 @@
   ];
   const DEST={name:'Destination',hood:'Kendall Sq / MIT',lat:42.3623,lng:-71.0843};
   function pin(color){ return {path:'M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24s12-15 12-24C24 5.37 18.63 0 12 0z',fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2,scale:1.15,anchor:new google.maps.Point(12,36),labelOrigin:new google.maps.Point(12,13)}; }
-  function infoHTML(t,s){ return `<div style="font-family:Montserrat,system-ui,sans-serif;padding:2px 4px 4px;min-width:140px;"><strong style="font-size:13px;">${t}</strong><br><span style="font-size:12px;color:#7c828f;">${s}</span></div>`; }
+  function commuteLine(p){
+    if(!p.commute) return 'Travel time calculating...';
+    if(p.commute.error) return p.commute.error;
+    return `${p.commute.duration} to ${DEST.hood} - ${p.commute.distance}`;
+  }
+  function infoHTML(t,s,extra){
+    const extraLine=extra?`<br><span style="font-size:12px;color:#2c3038;font-weight:600;">${extra}</span>`:'';
+    return `<div style="font-family:Montserrat,system-ui,sans-serif;padding:2px 4px 4px;min-width:170px;"><strong style="font-size:13px;">${t}</strong><br><span style="font-size:12px;color:#7c828f;">${s}</span>${extraLine}</div>`;
+  }
+  function commuteRows(status){
+    return PLACES.map(p=>{
+      const detail=status || commuteLine(p);
+      const cls=p.commute&&p.commute.error?' muted':'';
+      return `<div class="commute-row${cls}"><span class="tag">${p.tag}</span><div><b>${p.name}</b><small>${detail}</small></div></div>`;
+    }).join('');
+  }
+  function renderCommutes(status){
+    const el=document.getElementById('mapCommutes');
+    if(!el) return;
+    el.innerHTML=`<div class="commute-title">Travel time to ${DEST.hood}</div>${commuteRows(status)}`;
+  }
+  function loadCommuteTimes(){
+    const svc=new google.maps.DistanceMatrixService();
+    svc.getDistanceMatrix({
+      origins:PLACES.map(p=>({lat:p.lat,lng:p.lng})),
+      destinations:[{lat:DEST.lat,lng:DEST.lng}],
+      travelMode:google.maps.TravelMode.TRANSIT,
+      transitOptions:{departureTime:new Date()},
+      unitSystem:google.maps.UnitSystem.IMPERIAL,
+    },(response,status)=>{
+      if(status!=='OK'||!response||!response.rows){
+        PLACES.forEach(p=>{ p.commute={error:'Travel time unavailable'}; });
+        renderCommutes();
+        return;
+      }
+      response.rows.forEach((row,i)=>{
+        const result=row.elements&&row.elements[0];
+        if(result&&result.status==='OK'){
+          PLACES[i].commute={duration:result.duration.text,distance:result.distance.text};
+        }else{
+          PLACES[i].commute={error:'Transit route unavailable'};
+        }
+      });
+      renderCommutes();
+    });
+  }
   function initMap(){
     const box=document.getElementById('mapBox');
     if(!box||!(window.google&&google.maps))return;
-    box.classList.add('map-live'); box.style.position='relative'; box.innerHTML='<div id="gmap"></div>';
+    box.classList.add('map-live'); box.style.position='relative'; box.innerHTML='<div id="gmap"></div><div class="map-commutes" id="mapCommutes"></div>';
+    renderCommutes('Calculating transit time...');
     const map=new google.maps.Map(document.getElementById('gmap'),{center:{lat:DEST.lat,lng:DEST.lng},zoom:12,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,gestureHandling:'cooperative',styles:[{featureType:'poi',elementType:'labels',stylers:[{visibility:'off'}]}]});
     const bounds=new google.maps.LatLngBounds(), iw=new google.maps.InfoWindow();
-    PLACES.forEach(p=>{ const m=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'700'},title:p.name}); m.addListener('click',()=>{iw.setContent(infoHTML(`Option ${p.tag} · ${p.name}`,`${p.hood} · ${p.rent}/mo`));iw.open({map,anchor:m});}); bounds.extend(m.getPosition()); });
+    PLACES.forEach(p=>{ const m=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'700'},title:p.name}); m.addListener('click',()=>{iw.setContent(infoHTML(`Option ${p.tag} - ${p.name}`,`${p.hood} - ${p.rent}/mo`,commuteLine(p)));iw.open({map,anchor:m});}); bounds.extend(m.getPosition()); });
     const dmk=new google.maps.Marker({position:{lat:DEST.lat,lng:DEST.lng},map,icon:pin('#5b6ee0'),label:{text:'\u2605',color:'#fff',fontSize:'13px',fontWeight:'700'},title:DEST.name}); dmk.addListener('click',()=>{iw.setContent(infoHTML(DEST.name,DEST.hood));iw.open({map,anchor:dmk});}); bounds.extend(dmk.getPosition());
     map.fitBounds(bounds,64);
+    loadCommuteTimes();
   }
   function loadMaps(){
     if(!GOOGLE_MAPS_API_KEY)return;
