@@ -246,6 +246,27 @@
 
    
 
+  /* ----- recommendation ----- */
+  const rec=document.getElementById('recCard');
+  if(rec){
+    rec.innerHTML=`
+      <div class="rec-main">
+        <div class="rec-copy">
+          <div class="sec-label">Recommended next step</div>
+          <div class="rec-title"><span class="tag"></span><h3>Apply to Cambridge first</h3></div>
+          <p>It best matches the stated priorities: shortest commute, lowest listed rent, and the least day-to-day friction for Kendall / MIT. The space trade-off is real, so treat it as the option to move on only if the micro-studio size feels livable in person.</p>
+        </div>
+        <div class="rec-side">
+          <span class="pill star">${star(12)}Best current fit</span>
+          ${scoresHTML('B')}
+        </div>
+      </div>
+      <div class="rec-checks">
+        <div class="rec-check"><b>Before applying</b><span>Confirm total monthly cost, utilities, laundry, and any move-in fees.</span></div>
+        <div class="rec-check"><b>Backup plan</b><span>Keep Allston warm if the Cambridge layout feels too small after a tour.</span></div>
+      </div>`;
+  }
+
   /* ===================== GOOGLE MAPS ===================== */
   const PLACES=[
     {tag:'A',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',lat:42.3702,lng:-71.0389},
@@ -303,7 +324,13 @@
   function initMap(){
     const box=document.getElementById('mapBox');
     if(!box||!(window.google&&google.maps))return;
-    box.classList.add('map-live'); box.style.position='relative'; box.innerHTML='<div id="gmap"></div><div class="map-commutes" id="mapCommutes"></div>';
+    box.classList.add('map-live'); box.style.position='relative'; box.innerHTML='<div id="gmap"></div><button class="map-commute-toggle" id="mapCommuteToggle" type="button" aria-controls="mapCommutes" aria-expanded="true">Hide times</button><div class="map-commutes" id="mapCommutes"></div>';
+    const commuteToggle=document.getElementById('mapCommuteToggle');
+    commuteToggle.addEventListener('click',()=>{
+      const hidden=box.classList.toggle('commutes-hidden');
+      commuteToggle.textContent=hidden?'Show times':'Hide times';
+      commuteToggle.setAttribute('aria-expanded',String(!hidden));
+    });
     renderCommutes('Calculating transit time...');
     const map=new google.maps.Map(document.getElementById('gmap'),{center:{lat:DEST.lat,lng:DEST.lng},zoom:12,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,gestureHandling:'cooperative',styles:[{featureType:'poi',elementType:'labels',stylers:[{visibility:'off'}]}]});
     const bounds=new google.maps.LatLngBounds(), iw=new google.maps.InfoWindow();
