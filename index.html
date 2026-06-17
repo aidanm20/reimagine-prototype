@@ -52,7 +52,7 @@
             <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
               <div class="avatar" style="width:52px;height:52px;font-size:18px;">JD</div>
               <div style="flex:1;">
-                <h2 style="font-size:19px;font-weight:600;">Boston / Cambridge — First Apartment Search</h2>
+                <h2 style="font-size:19px;font-weight:600;">Profile</h2>
                 <div style="color:var(--text-2);font-size:13px;margin-top:2px;">First-time / early-stage renter · moving for grad school or a new job</div>
               </div>
             </div> 
@@ -133,6 +133,31 @@
         
 
         <div class="cmp-wrap"><div class="cmp" id="cmpTable"></div></div>
+
+        <div class="card compare-map-card">
+          <div class="compare-map-panel">
+            <div class="compare-map-controls">
+              <div>
+                <h3 class="card-t">Compare daily travel</h3>
+                <p class="card-s">Map each listing against the daily places and transportation choices from your priorities.</p>
+              </div>
+              <label class="select-field">
+                <span>Transportation</span>
+                <select id="compareMode"></select>
+              </label>
+              <label class="select-field">
+                <span>Daily place</span>
+                <select id="comparePlace"></select>
+              </label>
+              <div class="compare-route-list" id="compareRouteList"></div>
+            </div>
+            <div class="ph compare-map" id="compareMapBox">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4 6 2 5-2v14l-5 2-6-2-5 2V6Z"/><path d="M9 4v14M15 6v14"/></svg>
+              <span>Comparison map · listings + selected daily place</span>
+              <span style="font-size:11px;color:var(--text-3);">add a Google Maps key in ember/app.js to enable</span>
+            </div>
+          </div>
+        </div>
 
         <div class="footer-nav">
           <button class="btn subtle" onclick="go('v3')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</button>
