@@ -6,7 +6,7 @@
 <title>Reimagine Renting — Ember</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="ember/app.css">
 </head>
 <body>
@@ -14,8 +14,7 @@
   <!-- ============ SIDEBAR ============ -->
   <aside class="side">
     <div class="brand">
-      <div class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h14v-9"/><path d="M10 19v-5h4v5"/></svg></div>
-      <div class="bt">Reimagine Renting </div>
+      <div class="bt">Best current fit</div>
     </div> 
     <nav class="steps" id="steps"></nav>
     <div class="side-foot">
@@ -49,7 +48,7 @@
             <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
               <div class="avatar" style="width:52px;height:52px;font-size:18px;">JD</div>
               <div style="flex:1;">
-                <h2 style="font-size:19px;font-weight:600;">Profile</h2>
+                <h2 style="font-size:19px;">Profile</h2>
                </div>
             </div> 
             <dl class="dl">
@@ -138,7 +137,7 @@
                 <select id="compareMode"></select>
               </label>
               <label class="select-field">
-                <span>Daily place</span>
+                <span>Destination</span>
                 <select id="comparePlace"></select>
               </label>
               <div class="compare-route-list" id="compareRouteList"></div>
@@ -171,7 +170,7 @@
         <div class="card rec-card" id="recCard"></div>
 
         <div class="card pad" style="margin-bottom:18px;">
-          <h3 style="font-size:18px;font-weight:700;margin-bottom:14px;">After this comparison, what would you do with each option?</h3>
+          <h3 style="font-size:18px;margin-bottom:14px;">After this comparison, what would you do with each option?</h3>
           <div class="dec" id="decMatrix"></div>
           <div style="margin-top:16px;">
             

@@ -117,28 +117,19 @@
           <div class="meter">
             <div class="ml"><span>Listing detail confirmed</span><span>${confirmed}/${total}</span></div>
             <div class="mt"><i style="width:${pct}%"></i></div></div>
-          <details class="acts listing-actions">
-            <summary>Actions</summary>
-            <div class="listing-action-menu">
-              <button type="button" class="listing-action-item primary">Apply</button>
-              <button type="button" class="listing-action-item">Review</button>
-              <button type="button" class="listing-action-item danger">Reject</button>
-            </div>
-          </details>
+          <label class="acts listing-actions">
+            <span class="sr-only">Choose action for ${L.name}</span>
+            <select aria-label="Choose action for ${L.name}">
+              <option value="" selected>Actions</option>
+              <option value="apply">Apply</option>
+              <option value="review">Review</option>
+              <option value="reject">Reject</option>
+            </select>
+          </label>
         </div>`;
       lc.appendChild(el);
     });
   }
-
-  document.addEventListener('click', e=>{
-    const openMenu=e.target.closest('.listing-actions[open]');
-    document.querySelectorAll('.listing-actions[open]').forEach(menu=>{
-      if(menu!==openMenu) menu.removeAttribute('open');
-    });
-    if(e.target.closest('.listing-action-item')){
-      e.target.closest('.listing-actions')?.removeAttribute('open');
-    }
-  });
 
   /* ----- priorities ----- */
   const QS=[
@@ -275,7 +266,6 @@
           </div>
         </div>
         <div class="rec-side">
-          <span class="pill star">${star(12)}Best current fit</span>
           <div class="rec-score">
             <div><b>12 min</b><span>commute</span></div>
             <div><b>$1,900</b><span>listed rent</span></div>
@@ -291,7 +281,7 @@
     {tag:'B',name:'Cambridge Micro-Studio',hood:'Inman / Central',rent:'$1,900',lat:42.3656,lng:-71.1010},
     {tag:'C',name:'Allston 1-Bedroom',hood:'Allston',rent:'$2,400',lat:42.3536,lng:-71.1318},
   ];
-  const DEST={name:'Destination',hood:'Kendall Sq / MIT',lat:42.3623,lng:-71.0843};
+  const DEST={name:'Main Destination',hood:'Kendall Square / MIT / Central Square area',lat:42.3623,lng:-71.0843};
   const DAILY_TARGETS={
     'Grocery store':{name:'Star Market',hood:'Central Square grocery',lat:42.3652,lng:-71.1035},
     Cafe:{name:'Tatte Bakery & Cafe',hood:'Kendall Square cafe',lat:42.3628,lng:-71.0838},
@@ -306,8 +296,73 @@
     'Transit stop':{name:'Kendall/MIT Station',hood:'Red Line transit stop',lat:42.3625,lng:-71.0862},
   };
   const COMPARE_MODES=['Walk','Bike','Public transit','Drive','Mixed','Easiest, any mode'];
-  const COMPARE_PLACES=['Grocery store','Cafe','Gym','Park','Library','Pharmacy','Restaurants','Arts','Nightlife','Transit stop'];
-  const compareState={map:null,info:null,listingMarkers:[],targetMarker:null,results:[]};
+  const PLACE_SEARCH={
+    Work:null,
+    'Grocery store':{keyword:'grocery store'},
+    Cafe:{keyword:'cafe'},
+    Gym:{keyword:'gym'},
+    Park:{keyword:'park'},
+    Library:{keyword:'library'},
+    Pharmacy:{keyword:'pharmacy'},
+    Restaurants:{keyword:'restaurant'},
+    Arts:{keyword:'arts'},
+    Nightlife:{keyword:'nightlife'},
+    'Transit stop':{keyword:'transit stop'},
+  };
+  const FALLBACK_TARGETS={
+    'Grocery store':[
+      {name:'Shaw\'s East Boston',hood:'East Boston grocery',lat:42.3709,lng:-71.0385},
+      {name:'Star Market',hood:'Central Square grocery',lat:42.3652,lng:-71.1035},
+      {name:'Trader Joe\'s Allston',hood:'Allston grocery',lat:42.3550,lng:-71.1347},
+    ],
+    Cafe:[
+      {name:'Caffe Vittoria',hood:'East Boston cafe',lat:42.3691,lng:-71.0396},
+      {name:'1369 Coffee House',hood:'Central Square cafe',lat:42.3657,lng:-71.1031},
+      {name:'Pavement Coffeehouse',hood:'Allston cafe',lat:42.3522,lng:-71.1314},
+    ],
+    Gym:[
+      {name:'Planet Fitness East Boston',hood:'East Boston gym',lat:42.3742,lng:-71.0391},
+      {name:'MIT Recreation',hood:'Campus gym',lat:42.3594,lng:-71.0951},
+      {name:'Boston Sports Clubs Allston',hood:'Allston gym',lat:42.3529,lng:-71.1321},
+    ],
+    Park:[
+      {name:'Piers Park',hood:'East Boston park',lat:42.3648,lng:-71.0352},
+      {name:'Sennott Park',hood:'Cambridge park',lat:42.3666,lng:-71.1017},
+      {name:'Ringer Park',hood:'Allston park',lat:42.3507,lng:-71.1344},
+    ],
+    Library:[
+      {name:'East Boston Branch Library',hood:'East Boston library',lat:42.3755,lng:-71.0391},
+      {name:'Cambridge Public Library',hood:'Mid-Cambridge library',lat:42.3735,lng:-71.1106},
+      {name:'Honan-Allston Branch Library',hood:'Allston library',lat:42.3523,lng:-71.1372},
+    ],
+    Pharmacy:[
+      {name:'CVS Pharmacy',hood:'East Boston pharmacy',lat:42.3708,lng:-71.0390},
+      {name:'CVS Pharmacy',hood:'Central Square pharmacy',lat:42.3658,lng:-71.1031},
+      {name:'Walgreens Pharmacy',hood:'Allston pharmacy',lat:42.3529,lng:-71.1308},
+    ],
+    Restaurants:[
+      {name:'Angela\'s Cafe',hood:'East Boston restaurant',lat:42.3711,lng:-71.0398},
+      {name:'Central Square restaurants',hood:'Central Square',lat:42.3655,lng:-71.1037},
+      {name:'Lone Star Taco Bar',hood:'Allston restaurant',lat:42.3507,lng:-71.1342},
+    ],
+    Arts:[
+      {name:'ICA Watershed',hood:'East Boston arts',lat:42.3626,lng:-71.0316},
+      {name:'MIT List Visual Arts Center',hood:'Kendall / MIT arts',lat:42.3603,lng:-71.0871},
+      {name:'Studio 52',hood:'Allston arts',lat:42.3568,lng:-71.1274},
+    ],
+    Nightlife:[
+      {name:'The Quiet Few',hood:'East Boston nightlife',lat:42.3710,lng:-71.0402},
+      {name:'The Sinclair',hood:'Harvard Square nightlife',lat:42.3736,lng:-71.1190},
+      {name:'Silhouette Lounge',hood:'Allston nightlife',lat:42.3524,lng:-71.1315},
+    ],
+    'Transit stop':[
+      {name:'Maverick Station',hood:'Blue Line transit stop',lat:42.3691,lng:-71.0395},
+      {name:'Central Station',hood:'Red Line transit stop',lat:42.3655,lng:-71.1038},
+      {name:'Harvard Ave Station',hood:'Green Line transit stop',lat:42.3502,lng:-71.1317},
+    ],
+  };
+  const COMPARE_PLACES=['Work','Grocery store','Cafe','Gym','Park','Library','Pharmacy','Restaurants','Arts','Nightlife','Transit stop'];
+  const compareState={map:null,info:null,listingMarkers:[],targetMarkers:[],routeRenderers:[],results:[],targets:[],searchToken:0};
   function pin(color){ return {path:'M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24s12-15 12-24C24 5.37 18.63 0 12 0z',fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2,scale:1.15,anchor:new google.maps.Point(12,36),labelOrigin:new google.maps.Point(12,13)}; }
   function commuteLine(p){
     if(!p.commute) return 'Travel time calculating...';
@@ -315,8 +370,8 @@
     return `${p.commute.duration} to ${DEST.hood} - ${p.commute.distance}`;
   }
   function infoHTML(t,s,extra){
-    const extraLine=extra?`<br><span style="font-size:12px;color:#2c3038;font-weight:600;">${extra}</span>`:'';
-    return `<div style="font-family:Montserrat,system-ui,sans-serif;padding:2px 4px 4px;min-width:170px;"><strong style="font-size:13px;">${t}</strong><br><span style="font-size:12px;color:#7c828f;">${s}</span>${extraLine}</div>`;
+    const extraLine=extra?`<br><span style="font-size:12px;color:#2c3038;font-weight:500;">${extra}</span>`:'';
+    return `<div style="font-family:Ubuntu,Arial,Helvetica,sans-serif;padding:2px 4px 4px;min-width:170px;"><strong style="font-size:13px;font-weight:500;">${t}</strong><br><span style="font-size:12px;color:#7c828f;">${s}</span>${extraLine}</div>`;
   }
   function commuteRows(status){
     return PLACES.map(p=>{
@@ -336,11 +391,12 @@
     el.innerHTML=opts.map((o,i)=>`<option value="${o}"${i===selectedIndex?' selected':''}>${o}</option>`).join('');
     return el;
   }
-  function selectedCompareTarget(){
+  function selectedComparePlace(){
     const place=document.getElementById('comparePlace');
-    const value=place&&place.value;
-    if(value&&value.indexOf('Caf')===0) return DAILY_TARGETS.Cafe;
-    return DAILY_TARGETS[value] || DAILY_TARGETS['Transit stop'];
+    return place&&place.value ? place.value : 'Work';
+  }
+  function isWorkCompare(){
+    return selectedComparePlace()==='Work';
   }
   function selectedTravelMode(){
     const mode=document.getElementById('compareMode');
@@ -354,27 +410,83 @@
     const mode=document.getElementById('compareMode');
     return mode&&mode.value ? mode.value : 'Public transit';
   }
+  function routeColor(i){
+    return ['#e1582f','#3d7c5f','#5b6ee0'][i] || '#e1582f';
+  }
+  function milesBetween(a,b){
+    const toRad=n=>n*Math.PI/180;
+    const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
+    const lat1=toRad(a.lat), lat2=toRad(b.lat);
+    const h=Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+    return 3958.8 * 2 * Math.atan2(Math.sqrt(h),Math.sqrt(1-h));
+  }
+  function fallbackTarget(place,p){
+    const opts=FALLBACK_TARGETS[place] || [];
+    const best=opts.reduce((nearest,item)=>!nearest || milesBetween(p,item)<milesBetween(p,nearest) ? item : nearest,null);
+    return best || DEST;
+  }
+  function placeResultToTarget(result,place){
+    const loc=result.geometry&&result.geometry.location;
+    return {
+      name:result.name || place,
+      hood:result.vicinity || result.formatted_address || place,
+      lat:typeof loc.lat==='function' ? loc.lat() : loc.lat,
+      lng:typeof loc.lng==='function' ? loc.lng() : loc.lng,
+    };
+  }
+  function findNearestTarget(place,p){
+    if(place==='Work') return Promise.resolve({...DEST});
+    if(!(window.google&&google.maps&&google.maps.places&&compareState.map)){
+      return Promise.resolve(fallbackTarget(place,p));
+    }
+    return new Promise(resolve=>{
+      const service=new google.maps.places.PlacesService(compareState.map);
+      service.nearbySearch({
+        location:{lat:p.lat,lng:p.lng},
+        rankBy:google.maps.places.RankBy.DISTANCE,
+        keyword:(PLACE_SEARCH[place]&&PLACE_SEARCH[place].keyword) || place,
+      },(results,status)=>{
+        if(status===google.maps.places.PlacesServiceStatus.OK && results && results[0] && results[0].geometry){
+          resolve(placeResultToTarget(results[0],place));
+        }else{
+          resolve(fallbackTarget(place,p));
+        }
+      });
+    });
+  }
+  function clearCompareTargets(){
+    compareState.targetMarkers.forEach(m=>m.setMap(null));
+    compareState.targetMarkers=[];
+    compareState.routeRenderers.forEach(r=>r.setMap(null));
+    compareState.routeRenderers=[];
+  }
+  function routeTargetForIndex(i){
+    return compareState.targets[i] || (isWorkCompare() ? DEST : null);
+  }
   function compareRouteRows(status){
     return PLACES.map((p,i)=>{
       const result=compareState.results[i];
+      const target=routeTargetForIndex(i);
+      const targetName=target ? target.name : 'Nearest place';
       const detail=status || (result&&result.detail) || 'Travel time unavailable';
       const cls=result&&result.error?' muted':'';
-      return `<div class="compare-route${cls}"><span class="tag">${p.tag}</span><div><b>${p.name}</b><small>${detail}</small></div></div>`;
+      return `<div class="compare-route${cls}"><span class="tag">${p.tag}</span><div><b>${p.name}</b><small>${targetName} - ${detail}</small></div></div>`;
     }).join('');
   }
   function renderCompareRoutes(status){
     const el=document.getElementById('compareRouteList');
     if(!el) return;
-    const target=selectedCompareTarget();
-    el.innerHTML=`<div class="commute-title">${selectedModeLabel()} to ${target.name}</div>${compareRouteRows(status)}`;
+    const place=selectedComparePlace();
+    const label=place==='Work' ? `${DEST.name}: ${DEST.hood}` : `Nearest ${place.toLowerCase()} for each listing`;
+    el.innerHTML=`<div class="commute-title">${selectedModeLabel()} to ${label}</div>${compareRouteRows(status)}`;
   }
   function loadCompareTimes(){
     if(!(window.google&&google.maps)) return;
-    const target=selectedCompareTarget();
     const travelMode=selectedTravelMode();
+    const targets=compareState.targets.length ? compareState.targets : PLACES.map(()=>DEST);
     const request={
       origins:PLACES.map(p=>({lat:p.lat,lng:p.lng})),
-      destinations:[{lat:target.lat,lng:target.lng}],
+      destinations:targets.map(t=>({lat:t.lat,lng:t.lng})),
       travelMode,
       unitSystem:google.maps.UnitSystem.IMPERIAL,
     };
@@ -384,14 +496,43 @@
       if(status!=='OK'||!response||!response.rows){
         compareState.results=PLACES.map(()=>({error:1,detail:'Travel time unavailable'}));
         renderCompareRoutes();
+        drawCompareRoutes();
         return;
       }
-      compareState.results=response.rows.map(row=>{
-        const result=row.elements&&row.elements[0];
+      compareState.results=response.rows.map((row,i)=>{
+        const result=row.elements&&row.elements[isWorkCompare()?0:i];
         if(result&&result.status==='OK') return {detail:`${result.duration.text} - ${result.distance.text}`};
         return {error:1,detail:`${selectedModeLabel()} route unavailable`};
       });
       renderCompareRoutes();
+      drawCompareRoutes();
+    });
+  }
+  function drawCompareRoutes(){
+    if(!(compareState.map&&window.google&&google.maps)) return;
+    compareState.routeRenderers.forEach(r=>r.setMap(null));
+    compareState.routeRenderers=[];
+    const directions=new google.maps.DirectionsService();
+    const travelMode=selectedTravelMode();
+    PLACES.forEach((p,i)=>{
+      const target=routeTargetForIndex(i);
+      if(!target) return;
+      const renderer=new google.maps.DirectionsRenderer({
+        map:compareState.map,
+        suppressMarkers:true,
+        preserveViewport:true,
+        polylineOptions:{strokeColor:routeColor(i),strokeOpacity:.78,strokeWeight:4},
+      });
+      compareState.routeRenderers.push(renderer);
+      const request={
+        origin:{lat:p.lat,lng:p.lng},
+        destination:{lat:target.lat,lng:target.lng},
+        travelMode,
+      };
+      if(travelMode===google.maps.TravelMode.TRANSIT) request.transitOptions={departureTime:new Date()};
+      directions.route(request,(response,status)=>{
+        if(status==='OK') renderer.setDirections(response);
+      });
     });
   }
   function loadCommuteTimes(){
@@ -432,8 +573,8 @@
     renderCommutes('Calculating transit time...');
     const map=new google.maps.Map(document.getElementById('gmap'),{center:{lat:DEST.lat,lng:DEST.lng},zoom:12,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,gestureHandling:'cooperative',styles:[{featureType:'poi',elementType:'labels',stylers:[{visibility:'off'}]}]});
     const bounds=new google.maps.LatLngBounds(), iw=new google.maps.InfoWindow();
-    PLACES.forEach(p=>{ const m=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'700'},title:p.name}); m.addListener('click',()=>{iw.setContent(infoHTML(`Option ${p.tag} - ${p.name}`,`${p.hood} - ${p.rent}/mo`,commuteLine(p)));iw.open({map,anchor:m});}); bounds.extend(m.getPosition()); });
-    const dmk=new google.maps.Marker({position:{lat:DEST.lat,lng:DEST.lng},map,icon:pin('#5b6ee0'),label:{text:'\u2605',color:'#fff',fontSize:'13px',fontWeight:'700'},title:DEST.name}); dmk.addListener('click',()=>{iw.setContent(infoHTML(DEST.name,DEST.hood));iw.open({map,anchor:dmk});}); bounds.extend(dmk.getPosition());
+    PLACES.forEach(p=>{ const m=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'500'},title:p.name}); m.addListener('click',()=>{iw.setContent(infoHTML(`Option ${p.tag} - ${p.name}`,`${p.hood} - ${p.rent}/mo`,commuteLine(p)));iw.open({map,anchor:m});}); bounds.extend(m.getPosition()); });
+    const dmk=new google.maps.Marker({position:{lat:DEST.lat,lng:DEST.lng},map,icon:pin('#5b6ee0'),label:{text:'\u2605',color:'#fff',fontSize:'13px',fontWeight:'500'},title:DEST.name}); dmk.addListener('click',()=>{iw.setContent(infoHTML(DEST.name,DEST.hood));iw.open({map,anchor:dmk});}); bounds.extend(dmk.getPosition());
     map.fitBounds(bounds,64);
     loadCommuteTimes();
   }
@@ -456,19 +597,37 @@
       renderCompareRoutes('Map unavailable until Google Maps loads.');
       return;
     }
-    const target=selectedCompareTarget();
-    const pos={lat:target.lat,lng:target.lng};
-    if(compareState.targetMarker){
-      compareState.targetMarker.setPosition(pos);
-      compareState.targetMarker.setTitle(target.name);
-    }
-    const bounds=new google.maps.LatLngBounds();
-    compareState.listingMarkers.forEach(m=>bounds.extend(m.getPosition()));
-    bounds.extend(pos);
-    compareState.map.fitBounds(bounds,64);
+    const place=selectedComparePlace();
+    const token=++compareState.searchToken;
+    clearCompareTargets();
     compareState.results=[];
-    renderCompareRoutes('Calculating travel time...');
-    loadCompareTimes();
+    compareState.targets=[];
+    renderCompareRoutes(place==='Work' ? 'Preparing main destination...' : 'Finding nearest places...');
+    Promise.all(PLACES.map(p=>findNearestTarget(place,p))).then(targets=>{
+      if(token!==compareState.searchToken) return;
+      compareState.targets=place==='Work' ? PLACES.map(()=>DEST) : targets;
+      const markerTargets=place==='Work' ? [DEST] : targets;
+      markerTargets.forEach((target,i)=>{
+        const marker=new google.maps.Marker({
+          position:{lat:target.lat,lng:target.lng},
+          map:compareState.map,
+          icon:pin('#5b6ee0'),
+          label:{text:place==='Work' ? '\u2605' : PLACES[i].tag,color:'#fff',fontSize:'13px',fontWeight:'500'},
+          title:target.name,
+        });
+        marker.addListener('click',()=>{
+          compareState.info.setContent(infoHTML(target.name,target.hood));
+          compareState.info.open({map:compareState.map,anchor:marker});
+        });
+        compareState.targetMarkers.push(marker);
+      });
+      const bounds=new google.maps.LatLngBounds();
+      compareState.listingMarkers.forEach(m=>bounds.extend(m.getPosition()));
+      markerTargets.forEach(t=>bounds.extend({lat:t.lat,lng:t.lng}));
+      compareState.map.fitBounds(bounds,64);
+      renderCompareRoutes('Calculating travel time...');
+      loadCompareTimes();
+    });
   }
   function refreshCompareMap(){
     initCompareControls();
@@ -487,13 +646,10 @@
     compareState.map=new google.maps.Map(document.getElementById('compareGmap'),{center:{lat:DEST.lat,lng:DEST.lng},zoom:12,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,gestureHandling:'cooperative',styles:[{featureType:'poi',elementType:'labels',stylers:[{visibility:'off'}]}]});
     compareState.info=new google.maps.InfoWindow();
     compareState.listingMarkers=PLACES.map(p=>{
-      const marker=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map:compareState.map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'700'},title:p.name});
+      const marker=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map:compareState.map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'500'},title:p.name});
       marker.addListener('click',()=>{ compareState.info.setContent(infoHTML(`Option ${p.tag} - ${p.name}`,`${p.hood} - ${p.rent}/mo`)); compareState.info.open({map:compareState.map,anchor:marker}); });
       return marker;
     });
-    const target=selectedCompareTarget();
-    compareState.targetMarker=new google.maps.Marker({position:{lat:target.lat,lng:target.lng},map:compareState.map,icon:pin('#5b6ee0'),label:{text:'\u2605',color:'#fff',fontSize:'13px',fontWeight:'700'},title:target.name});
-    compareState.targetMarker.addListener('click',()=>{ const t=selectedCompareTarget(); compareState.info.setContent(infoHTML(t.name,t.hood)); compareState.info.open({map:compareState.map,anchor:compareState.targetMarker}); });
     updateCompareMap();
   }
   function initMaps(){
@@ -504,7 +660,7 @@
     if(!GOOGLE_MAPS_API_KEY)return;
     if(window.google&&google.maps){initMaps();return;}
     window.__rrInitMap=initMaps;
-    const s=document.createElement('script'); s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&callback=__rrInitMap'; s.async=true; s.defer=true; document.head.appendChild(s);
+    const s=document.createElement('script'); s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&libraries=places&callback=__rrInitMap'; s.async=true; s.defer=true; document.head.appendChild(s);
   }
   initCompareControls();
   loadMaps();
