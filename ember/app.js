@@ -29,7 +29,7 @@
     {id:'v2', label:'Listings',   sub:'3 saved',       ic:ICON.home},
     {id:'v3', label:'Priorities', sub:'What matters',  ic:ICON.list},
     {id:'v4', label:'Comparison', sub:'Analysis',      ic:ICON.grid},
-    {id:'v5', label:'Trade-offs', sub:'Summary',       ic:ICON.target},
+    {id:'v5', label:'Trade offs', sub:'Summary',       ic:ICON.target},
   ];
   const idx = id => STEPS.findIndex(s=>s.id===id);
 
@@ -117,27 +117,35 @@
           <div class="meter">
             <div class="ml"><span>Listing detail confirmed</span><span>${confirmed}/${total}</span></div>
             <div class="mt"><i style="width:${pct}%"></i></div></div>
-          <div class="acts">
-            <button class="btn primary sm">Apply</button>
-            <button class="btn sm">Edit</button>
-            <button class="btn danger sm">Reject</button></div>
+          <details class="acts listing-actions">
+            <summary>Actions</summary>
+            <div class="listing-action-menu">
+              <button type="button" class="listing-action-item primary">Apply</button>
+              <button type="button" class="listing-action-item">Review</button>
+              <button type="button" class="listing-action-item danger">Reject</button>
+            </div>
+          </details>
         </div>`;
       lc.appendChild(el);
     });
   }
 
+  document.addEventListener('click', e=>{
+    const openMenu=e.target.closest('.listing-actions[open]');
+    document.querySelectorAll('.listing-actions[open]').forEach(menu=>{
+      if(menu!==openMenu) menu.removeAttribute('open');
+    });
+    if(e.target.closest('.listing-action-item')){
+      e.target.closest('.listing-actions')?.removeAttribute('open');
+    }
+  });
+
   /* ----- priorities ----- */
   const QS=[
     {q:'Besides rent, what matters most?',hint:'choose up to 2',type:'multi',max:2,
      opts:['Short commute','Lower total cost','Daily convenience','Quiet environment','Social / lively','Larger space','Safety / comfort','Flexibility','Lower upfront cost']},
-    {q:'Which daily places matter most near home?',hint:'choose up to 3',type:'multi',max:3,
-     opts:['Grocery store','Café','Gym','Park','Library','Pharmacy','Restaurants','Arts','Nightlife','Transit stop']},
     {q:'What neighborhood feeling do you prefer?',hint:'pick one',type:'single',
      opts:['Quiet & residential','Lively & social','Walkable & convenient','Close to work','Diverse & local','Clean & predictable','Creative / artsy','No preference']},
-    {q:'How would you usually commute?',hint:'pick one',type:'single',
-     opts:['Walk','Bike','Public transit','Drive','Mixed','Easiest, any mode']},
-    {q:'How much walking before transit feels okay?',hint:'pick one',type:'single',
-     opts:['0–5 min','5–10 min','10–15 min','15+ is okay','Rather not rely on it']},
     {q:'What would make an apartment feel wrong?',hint:'choose up to 2',type:'multi',max:2,
      opts:['Too noisy','Too isolated','Too small','Bad commute','No grocery nearby','Unclear fees','Pricey after extras','Not enough light','Doesn’t feel safe','Too far from friends']},
     {q:'Which option are you leaning toward — and why?',hint:'open response',type:'text'},
@@ -145,7 +153,7 @@
   function qCard(item,i){
     const el=document.createElement('div'); el.className='card q';
     let chips;
-    if(item.type==='text') chips=`<div class="input-ph tall">Type your answer…</div>`;
+    if(item.type==='text') chips=`<textarea class="input-ph tall q-text" rows="4" placeholder="Type your answer..."></textarea>`;
     else {
       const single=item.type==='single';
       const maxAttr=item.max?` data-max="${item.max}"`:'';
@@ -259,16 +267,21 @@
       <div class="rec-main">
         <div class="rec-copy">
           <div class="sec-label">Recommended next step</div>
-          <div class="rec-title"><span class="tag"></span><h3>Apply to Cambridge first</h3></div>
+          <div class="rec-title"><span class="tag">B</span><h3>Apply to Cambridge first</h3></div>
           <p>It best matches the stated priorities: shortest commute, lowest listed rent, and the least day-to-day friction for Kendall / MIT. The space trade-off is real, so treat it as the option to move on only if the micro-studio size feels livable in person.</p>
+          <div class="rec-checks">
+            <div class="rec-check"><b>Before applying</b><span>Confirm total monthly cost, utilities, laundry, and any move-in fees.</span></div>
+            <div class="rec-check"><b>Backup plan</b><span>Keep Allston warm if the Cambridge layout feels too small after a tour.</span></div>
+          </div>
         </div>
         <div class="rec-side">
           <span class="pill star">${star(12)}Best current fit</span>
+          <div class="rec-score">
+            <div><b>12 min</b><span>commute</span></div>
+            <div><b>$1,900</b><span>listed rent</span></div>
+            <div><b>Low</b><span>daily friction</span></div>
+          </div>
         </div>
-      </div>
-      <div class="rec-checks">
-        <div class="rec-check"><b>Before applying</b><span>Confirm total monthly cost, utilities, laundry, and any move-in fees.</span></div>
-        <div class="rec-check"><b>Backup plan</b><span>Keep Allston warm if the Cambridge layout feels too small after a tour.</span></div>
       </div>`;
   }
 
@@ -292,6 +305,8 @@
     'Nightlife':{name:'The Sinclair',hood:'Harvard Square nightlife',lat:42.3736,lng:-71.1190},
     'Transit stop':{name:'Kendall/MIT Station',hood:'Red Line transit stop',lat:42.3625,lng:-71.0862},
   };
+  const COMPARE_MODES=['Walk','Bike','Public transit','Drive','Mixed','Easiest, any mode'];
+  const COMPARE_PLACES=['Grocery store','Cafe','Gym','Park','Library','Pharmacy','Restaurants','Arts','Nightlife','Transit stop'];
   const compareState={map:null,info:null,listingMarkers:[],targetMarker:null,results:[]};
   function pin(color){ return {path:'M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24s12-15 12-24C24 5.37 18.63 0 12 0z',fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2,scale:1.15,anchor:new google.maps.Point(12,36),labelOrigin:new google.maps.Point(12,13)}; }
   function commuteLine(p){
@@ -423,8 +438,8 @@
     loadCommuteTimes();
   }
   function initCompareControls(){
-    const mode=fillSelect('compareMode',QS[3].opts,2);
-    const place=fillSelect('comparePlace',QS[1].opts,0);
+    const mode=fillSelect('compareMode',COMPARE_MODES,2);
+    const place=fillSelect('comparePlace',COMPARE_PLACES,0);
     if(mode&&!mode.dataset.bound){
       mode.addEventListener('change',updateCompareMap);
       mode.dataset.bound='1';
