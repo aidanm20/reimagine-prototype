@@ -81,17 +81,17 @@
 
   /* =================== DATA =================== */
   const LISTINGS=[
-    {tag:'A',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',bed:'Studio',bath:'1 bath',size:'281 sqft',
+    {tag:'a',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',bed:'Studio',bath:'1 bath',size:'281 sqft',
      snap:'Compact studio with the lowest listed rent and basic apartment features.',
      rows:[['Amenities','Refrigerator; basic',1],['Laundry','Not listed',0],['Pet policy','Not listed',0],['Parking','Not listed',0],['Visible fees','May apply',0]],
-     dist:'Farther from Kendall / MIT — likely cross-harbor commute.'},
-    {tag:'B',name:'Cambridge Micro-Studio',hood:'Cambridge / Inman–Central',rent:'$1,900',bed:'Studio',bath:'1 bath',size:'290 sqft',
+     dist:'Farther from Kendall / Mit — likely cross-harbor commute.'},
+    {tag:'b',name:'Cambridge Micro-Studio',hood:'Cambridge / Inman–Central',rent:'$1,900',bed:'Studio',bath:'1 bath',size:'290 sqft',
      snap:'Very small studio in a central, well-connected Cambridge location.',
      rows:[['Amenities','Basic; verify',0],['Laundry','Not listed',0],['Pet policy','Not listed',0],['Parking','Not listed',0],['Visible fees','Total shown; verify',0]],
-     dist:'Closest to Kendall / MIT / Central.'},
-    {tag:'C',name:'Allston 1-Bedroom',hood:'Allston',rent:'$2,400',bed:'1 bed',bath:'1 bath',size:'637 sqft',
-     snap:'Larger 1BR in a brick building near BU, the Green Line B, and Star Market.',
-     rows:[['Amenities','A/C, dishwasher, hardwood',1],['Laundry','On-site',1],['Pet policy','Not listed',0],['Parking','On-site available',1],['Visible fees','May apply',0]],
+     dist:'Closest to Kendall / Mit / Central.'},
+    {tag:'c',name:'Allston 1-Bedroom',hood:'Allston',rent:'$2,400',bed:'1 bed',bath:'1 bath',size:'637 sqft',
+     snap:'Larger 1br in a brick building near Bu, the Green Line b, and Star Market.',
+     rows:[['Amenities','a/c, dishwasher, hardwood',1],['Laundry','On-site',1],['Pet policy','Not listed',0],['Parking','On-site available',1],['Visible fees','May apply',0]],
      dist:'Farther than Cambridge, but more spacious & lifestyle-rich.'},
   ];
   const lc=document.getElementById('listingCards');
@@ -162,9 +162,9 @@
 
   /* ----- score meters (commute / space / value) ----- */
   const SCORES={
-    A:{Commute:35,Space:32,Value:70},
-    B:{Commute:95,Space:20,Value:76},
-    C:{Commute:55,Space:92,Value:48},
+    a:{Commute:35,Space:32,Value:70},
+    b:{Commute:95,Space:20,Value:76},
+    c:{Commute:55,Space:92,Value:48},
   };
   const SCORE_IC={Commute:ICON.train, Space:ICON.box, Value:ICON.gauge};
   function scoresHTML(tag){
@@ -175,9 +175,9 @@
 
   /* ----- comparison: fit-at-a-glance ----- */
   const HEADS=[
-    {tag:'A',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',best:'Lowest rent'},
-    {tag:'B',name:'Cambridge Micro-Studio',hood:'Inman / Central',rent:'$1,900',best:'Best commute'},
-    {tag:'C',name:'Allston 1-Bedroom',hood:'Allston',rent:'$2,400',best:'Most space'},
+    {tag:'a',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',best:'Lowest rent'},
+    {tag:'b',name:'Cambridge Micro-Studio',hood:'Inman / Central',rent:'$1,900',best:'Best commute'},
+    {tag:'c',name:'Allston 1-Bedroom',hood:'Allston',rent:'$2,400',best:'Most space'},
   ];
   const fg=document.getElementById('fitGlance');
   if(fg){
@@ -208,8 +208,7 @@
       return `<div class="cl${you?' you':''}">${inner}</div>`;
     };
     let h=`<div class="ch corner"><span class="sec-label"> Listings</span></div>`;
-    HEADS.forEach(hd=>{ h+=`<div class="ch"><div class="ch-top"><span class="tag">${hd.tag}</span><div><h4>${hd.name}</h4><div class="ch-rent">${hd.rent}<small>/mo</small></div></div></div></div>`; });
-    h+=`<div class="seclab">Core fields</div>`;
+    HEADS.forEach(hd=>{ h+=`<div class="ch"><div class="ch-top"><span class="tag">${hd.tag}</span><div><h4>${hd.name}</h4></div></div></div>`; });
     CMP.core.forEach(r=>{ h+=`<div class="rl">${r.lab}</div>`+r.v.map(c=>cell(c,false)).join(''); });
     h+=`<div class="seclab you">${star(12)}Your priorities</div>`;
     CMP.you.forEach(r=>{ h+=`<div class="rl you">${star(11)}${r.lab}</div>`+r.v.map(c=>cell(c,true)).join(''); });
@@ -218,9 +217,9 @@
 
   /* ----- trade-offs ----- */
   const TO=[
-    {tag:'A',name:'East Boston',rent:'$1,975',pos:'Lowest listed rent of the three.',neg:'The rent edge shrinks once commute, utilities, laundry & unclear fees are counted.',fit:'Someone who prioritizes listed rent and can tolerate a less direct commute.'},
-    {tag:'B',name:'Cambridge',rent:'$1,900',pos:'Strongest central access — lowest friction to Kendall / MIT.',neg:'Very small (290 sqft) — tough for storage, WFH, or a sense of home.',fit:'Commute-first renters who travel light.'},
-    {tag:'C',name:'Allston',rent:'$2,400',pos:'Most space & daily-life convenience — grocery, cafés, a livable home.',neg:'Highest true monthly cost; less direct to Kendall / MIT / Central.',fit:'Renters trading budget for comfort & neighborhood life.'},
+    {tag:'a',name:'East Boston',rent:'$1,975',pos:'Lowest listed rent of the three.',neg:'The rent edge shrinks once commute, utilities, laundry & unclear fees are counted.',fit:'Someone who prioritizes listed rent and can tolerate a less direct commute.'},
+    {tag:'b',name:'Cambridge',rent:'$1,900',pos:'Strongest central access — lowest friction to Kendall / Mit.',neg:'Very small (290 sqft) — tough for storage, wfh, or a sense of home.',fit:'Commute-first renters who travel light.'},
+    {tag:'c',name:'Allston',rent:'$2,400',pos:'Most space & daily-life convenience — grocery, cafés, a livable home.',neg:'Highest true monthly cost; less direct to Kendall / Mit / Central.',fit:'Renters trading budget for comfort & neighborhood life.'},
   ];
   const toc=document.getElementById('toCards');
   if(toc){
@@ -241,7 +240,7 @@
   const DEC=['Apply','Save for later','Reject','Not sure'];
   const dm=document.getElementById('decMatrix');
   if(dm){
-    [['A','East Boston'],['B','Cambridge'],['C','Allston']].forEach((o,ri)=>{
+    [['a','East Boston'],['b','Cambridge'],['c','Allston']].forEach((o,ri)=>{
       const row=document.createElement('div'); row.className='drow';
       row.innerHTML=`<div class="dopt"><span class="tag">${o[0]}</span>Option ${o[0]} — ${o[1]}</div>
         <div class="seg">${DEC.map(d=>`<span class="chip radio" data-chip data-group="dec${ri}"><span class="tick">${tick}</span>${d}</span>`).join('')}</div>`;
@@ -258,8 +257,8 @@
       <div class="rec-main">
         <div class="rec-copy">
           <div class="sec-label">Recommended next step</div>
-          <div class="rec-title"><span class="tag">B</span><h3>Apply to Cambridge first</h3></div>
-          <p>It best matches the stated priorities: shortest commute, lowest listed rent, and the least day-to-day friction for Kendall / MIT. The space trade-off is real, so treat it as the option to move on only if the micro-studio size feels livable in person.</p>
+          <div class="rec-title"><span class="tag">b</span><h3>Apply to Cambridge first</h3></div>
+          <p>It best matches the stated priorities: shortest commute, lowest listed rent, and the least day-to-day friction for Kendall / Mit. The space trade-off is real, so treat it as the option to move on only if the micro-studio size feels livable in person.</p>
           <div class="rec-checks">
             <div class="rec-check"><b>Before applying</b><span>Confirm total monthly cost, utilities, laundry, and any move-in fees.</span></div>
             <div class="rec-check"><b>Backup plan</b><span>Keep Allston warm if the Cambridge layout feels too small after a tour.</span></div>
@@ -277,23 +276,23 @@
 
   /* ===================== GOOGLE MAPS ===================== */
   const PLACES=[
-    {tag:'A',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',lat:42.3702,lng:-71.0389},
-    {tag:'B',name:'Cambridge Micro-Studio',hood:'Inman / Central',rent:'$1,900',lat:42.3656,lng:-71.1010},
-    {tag:'C',name:'Allston 1-Bedroom',hood:'Allston',rent:'$2,400',lat:42.3536,lng:-71.1318},
+    {tag:'a',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',lat:42.3702,lng:-71.0389},
+    {tag:'b',name:'Cambridge Micro-Studio',hood:'Inman / Central',rent:'$1,900',lat:42.3656,lng:-71.1010},
+    {tag:'c',name:'Allston 1-Bedroom',hood:'Allston',rent:'$2,400',lat:42.3536,lng:-71.1318},
   ];
-  const DEST={name:'Main Destination',hood:'Kendall Square / MIT / Central Square area',lat:42.3623,lng:-71.0843};
+  const DEST={name:'Main Destination',hood:'Kendall Square / Mit / Central Square area',lat:42.3623,lng:-71.0843};
   const DAILY_TARGETS={
     'Grocery store':{name:'Star Market',hood:'Central Square grocery',lat:42.3652,lng:-71.1035},
     Cafe:{name:'Tatte Bakery & Cafe',hood:'Kendall Square cafe',lat:42.3628,lng:-71.0838},
     'CafÃ©':{name:'Tatte Bakery & Cafe',hood:'Kendall Square cafe',lat:42.3628,lng:-71.0838},
-    'Gym':{name:'MIT Recreation',hood:'Campus gym',lat:42.3594,lng:-71.0951},
+    'Gym':{name:'Mit Recreation',hood:'Campus gym',lat:42.3594,lng:-71.0951},
     'Park':{name:'Danehy Park',hood:'North Cambridge park',lat:42.3896,lng:-71.1323},
     'Library':{name:'Cambridge Public Library',hood:'Mid-Cambridge library',lat:42.3735,lng:-71.1106},
-    'Pharmacy':{name:'CVS Pharmacy',hood:'Central Square pharmacy',lat:42.3658,lng:-71.1031},
+    'Pharmacy':{name:'Cvs Pharmacy',hood:'Central Square pharmacy',lat:42.3658,lng:-71.1031},
     'Restaurants':{name:'Central Square restaurants',hood:'Central Square',lat:42.3655,lng:-71.1037},
-    'Arts':{name:'MIT List Visual Arts Center',hood:'Kendall / MIT arts',lat:42.3603,lng:-71.0871},
+    'Arts':{name:'Mit List Visual Arts Center',hood:'Kendall / Mit arts',lat:42.3603,lng:-71.0871},
     'Nightlife':{name:'The Sinclair',hood:'Harvard Square nightlife',lat:42.3736,lng:-71.1190},
-    'Transit stop':{name:'Kendall/MIT Station',hood:'Red Line transit stop',lat:42.3625,lng:-71.0862},
+    'Transit stop':{name:'Kendall/Mit Station',hood:'Red Line transit stop',lat:42.3625,lng:-71.0862},
   };
   const COMPARE_MODES=['Walk','Bike','Public transit','Drive','Mixed','Easiest, any mode'];
   const PLACE_SEARCH={
@@ -322,7 +321,7 @@
     ],
     Gym:[
       {name:'Planet Fitness East Boston',hood:'East Boston gym',lat:42.3742,lng:-71.0391},
-      {name:'MIT Recreation',hood:'Campus gym',lat:42.3594,lng:-71.0951},
+      {name:'Mit Recreation',hood:'Campus gym',lat:42.3594,lng:-71.0951},
       {name:'Boston Sports Clubs Allston',hood:'Allston gym',lat:42.3529,lng:-71.1321},
     ],
     Park:[
@@ -336,8 +335,8 @@
       {name:'Honan-Allston Branch Library',hood:'Allston library',lat:42.3523,lng:-71.1372},
     ],
     Pharmacy:[
-      {name:'CVS Pharmacy',hood:'East Boston pharmacy',lat:42.3708,lng:-71.0390},
-      {name:'CVS Pharmacy',hood:'Central Square pharmacy',lat:42.3658,lng:-71.1031},
+      {name:'Cvs Pharmacy',hood:'East Boston pharmacy',lat:42.3708,lng:-71.0390},
+      {name:'Cvs Pharmacy',hood:'Central Square pharmacy',lat:42.3658,lng:-71.1031},
       {name:'Walgreens Pharmacy',hood:'Allston pharmacy',lat:42.3529,lng:-71.1308},
     ],
     Restaurants:[
@@ -346,8 +345,8 @@
       {name:'Lone Star Taco Bar',hood:'Allston restaurant',lat:42.3507,lng:-71.1342},
     ],
     Arts:[
-      {name:'ICA Watershed',hood:'East Boston arts',lat:42.3626,lng:-71.0316},
-      {name:'MIT List Visual Arts Center',hood:'Kendall / MIT arts',lat:42.3603,lng:-71.0871},
+      {name:'Ica Watershed',hood:'East Boston arts',lat:42.3626,lng:-71.0316},
+      {name:'Mit List Visual Arts Center',hood:'Kendall / Mit arts',lat:42.3603,lng:-71.0871},
       {name:'Studio 52',hood:'Allston arts',lat:42.3568,lng:-71.1274},
     ],
     Nightlife:[
@@ -398,6 +397,19 @@
   function isWorkCompare(){
     return selectedComparePlace()==='Work';
   }
+  function selectedOptionCount(){
+    const count=document.getElementById('compareCount');
+    return Math.max(1,Math.min(5,Number(count&&count.value) || 3));
+  }
+  function updateOptionCountControl(){
+    const disabled=isWorkCompare();
+    const count=document.getElementById('compareCount');
+    const value=document.getElementById('compareCountValue');
+    const field=document.getElementById('compareCountField');
+    if(count) count.disabled=disabled;
+    if(value) value.textContent=disabled ? '1' : String(selectedOptionCount());
+    if(field) field.classList.toggle('is-disabled',disabled);
+  }
   function selectedTravelMode(){
     const mode=document.getElementById('compareMode');
     const value=mode&&mode.value;
@@ -420,10 +432,10 @@
     const h=Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
     return 3958.8 * 2 * Math.atan2(Math.sqrt(h),Math.sqrt(1-h));
   }
-  function fallbackTarget(place,p){
+  function fallbackTargets(place,p,count){
     const opts=FALLBACK_TARGETS[place] || [];
-    const best=opts.reduce((nearest,item)=>!nearest || milesBetween(p,item)<milesBetween(p,nearest) ? item : nearest,null);
-    return best || DEST;
+    const sorted=[...opts].sort((a,b)=>milesBetween(p,a)-milesBetween(p,b));
+    return (sorted.length ? sorted : [DEST]).slice(0,count);
   }
   function placeResultToTarget(result,place){
     const loc=result.geometry&&result.geometry.location;
@@ -434,10 +446,10 @@
       lng:typeof loc.lng==='function' ? loc.lng() : loc.lng,
     };
   }
-  function findNearestTarget(place,p){
-    if(place==='Work') return Promise.resolve({...DEST});
+  function findNearestTargets(place,p,count){
+    if(place==='Work') return Promise.resolve([{...DEST}]);
     if(!(window.google&&google.maps&&google.maps.places&&compareState.map)){
-      return Promise.resolve(fallbackTarget(place,p));
+      return Promise.resolve(fallbackTargets(place,p,count));
     }
     return new Promise(resolve=>{
       const service=new google.maps.places.PlacesService(compareState.map);
@@ -446,10 +458,11 @@
         rankBy:google.maps.places.RankBy.DISTANCE,
         keyword:(PLACE_SEARCH[place]&&PLACE_SEARCH[place].keyword) || place,
       },(results,status)=>{
-        if(status===google.maps.places.PlacesServiceStatus.OK && results && results[0] && results[0].geometry){
-          resolve(placeResultToTarget(results[0],place));
+        if(status===google.maps.places.PlacesServiceStatus.OK && results && results.length){
+          const places=results.filter(r=>r.geometry).slice(0,count).map(r=>placeResultToTarget(r,place));
+          resolve(places.length ? places : fallbackTargets(place,p,count));
         }else{
-          resolve(fallbackTarget(place,p));
+          resolve(fallbackTargets(place,p,count));
         }
       });
     });
@@ -461,9 +474,21 @@
     compareState.routeRenderers=[];
   }
   function routeTargetForIndex(i){
-    return compareState.targets[i] || (isWorkCompare() ? DEST : null);
+    const target=compareState.targets[i];
+    if(Array.isArray(target)) return target[0] || (isWorkCompare() ? DEST : null);
+    return target || (isWorkCompare() ? DEST : null);
   }
   function compareRouteRows(status){
+    if(!isWorkCompare()){
+      return PLACES.map((p,i)=>{
+        const targets=Array.isArray(compareState.targets[i]) ? compareState.targets[i] : [];
+        if(status && !targets.length){
+          return `<div class="compare-route muted"><span class="tag">${p.tag}</span><div><b>${p.name}</b><small>${status}</small></div></div>`;
+        }
+        const details=targets.length ? targets.map((target,ti)=>`<span>${ti+1}. ${target.name} - ${milesBetween(p,target).toFixed(1)} mi</span>`).join('') : '<span>Nearest places unavailable</span>';
+        return `<div class="compare-route stack"><span class="tag">${p.tag}</span><div><b>${p.name}</b><small>${targets.length} nearest ${selectedComparePlace().toLowerCase()}</small><div class="nearby-options">${details}</div></div></div>`;
+      }).join('');
+    }
     return PLACES.map((p,i)=>{
       const result=compareState.results[i];
       const target=routeTargetForIndex(i);
@@ -477,13 +502,19 @@
     const el=document.getElementById('compareRouteList');
     if(!el) return;
     const place=selectedComparePlace();
-    const label=place==='Work' ? `${DEST.name}: ${DEST.hood}` : `Nearest ${place.toLowerCase()} for each listing`;
+    const label=place==='Work' ? `${DEST.name}: ${DEST.hood}` : `${selectedOptionCount()} nearest ${place.toLowerCase()} for each listing`;
     el.innerHTML=`<div class="commute-title">${selectedModeLabel()} to ${label}</div>${compareRouteRows(status)}`;
   }
   function loadCompareTimes(){
     if(!(window.google&&google.maps)) return;
+    if(!isWorkCompare()){
+      compareState.results=[];
+      renderCompareRoutes();
+      drawCompareRoutes();
+      return;
+    }
     const travelMode=selectedTravelMode();
-    const targets=compareState.targets.length ? compareState.targets : PLACES.map(()=>DEST);
+    const targets=compareState.targets.length ? compareState.targets.map((target,i)=>routeTargetForIndex(i)) : PLACES.map(()=>DEST);
     const request={
       origins:PLACES.map(p=>({lat:p.lat,lng:p.lng})),
       destinations:targets.map(t=>({lat:t.lat,lng:t.lng})),
@@ -512,6 +543,7 @@
     if(!(compareState.map&&window.google&&google.maps)) return;
     compareState.routeRenderers.forEach(r=>r.setMap(null));
     compareState.routeRenderers=[];
+    if(!isWorkCompare()) return;
     const directions=new google.maps.DirectionsService();
     const travelMode=selectedTravelMode();
     PLACES.forEach((p,i)=>{
@@ -581,6 +613,7 @@
   function initCompareControls(){
     const mode=fillSelect('compareMode',COMPARE_MODES,2);
     const place=fillSelect('comparePlace',COMPARE_PLACES,0);
+    const count=document.getElementById('compareCount');
     if(mode&&!mode.dataset.bound){
       mode.addEventListener('change',updateCompareMap);
       mode.dataset.bound='1';
@@ -589,6 +622,14 @@
       place.addEventListener('change',updateCompareMap);
       place.dataset.bound='1';
     }
+    if(count&&!count.dataset.bound){
+      count.addEventListener('input',()=>{
+        updateOptionCountControl();
+        updateCompareMap();
+      });
+      count.dataset.bound='1';
+    }
+    updateOptionCountControl();
     renderCompareRoutes('Choose options to compare travel time.');
   }
   function updateCompareMap(){
@@ -603,16 +644,18 @@
     compareState.results=[];
     compareState.targets=[];
     renderCompareRoutes(place==='Work' ? 'Preparing main destination...' : 'Finding nearest places...');
-    Promise.all(PLACES.map(p=>findNearestTarget(place,p))).then(targets=>{
+    Promise.all(PLACES.map(p=>findNearestTargets(place,p,place==='Work' ? 1 : selectedOptionCount()))).then(targets=>{
       if(token!==compareState.searchToken) return;
-      compareState.targets=place==='Work' ? PLACES.map(()=>DEST) : targets;
-      const markerTargets=place==='Work' ? [DEST] : targets;
-      markerTargets.forEach((target,i)=>{
+      compareState.targets=place==='Work' ? PLACES.map(()=>[{...DEST}]) : targets;
+      const markerTargets=place==='Work'
+        ? [{...DEST,markerLabel:'\u2605'}]
+        : targets.flatMap((group,i)=>group.map((target,ti)=>({...target,markerLabel:`${PLACES[i].tag}${ti+1}`})));
+      markerTargets.forEach(target=>{
         const marker=new google.maps.Marker({
           position:{lat:target.lat,lng:target.lng},
           map:compareState.map,
           icon:pin('#5b6ee0'),
-          label:{text:place==='Work' ? '\u2605' : PLACES[i].tag,color:'#fff',fontSize:'13px',fontWeight:'500'},
+          label:{text:target.markerLabel,color:'#fff',fontSize:'11px',fontWeight:'500'},
           title:target.name,
         });
         marker.addListener('click',()=>{
@@ -625,7 +668,7 @@
       compareState.listingMarkers.forEach(m=>bounds.extend(m.getPosition()));
       markerTargets.forEach(t=>bounds.extend({lat:t.lat,lng:t.lng}));
       compareState.map.fitBounds(bounds,64);
-      renderCompareRoutes('Calculating travel time...');
+      renderCompareRoutes(place==='Work' ? 'Calculating travel time...' : null);
       loadCompareTimes();
     });
   }

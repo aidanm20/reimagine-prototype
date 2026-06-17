@@ -46,14 +46,14 @@
           <!-- profile card (moved from scenario) -->
           <div class="card pad">
             <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
-              <div class="avatar" style="width:52px;height:52px;font-size:18px;">JD</div>
+              <div class="avatar" style="width:52px;height:52px;font-size:18px;">Jd</div>
               <div style="flex:1;">
                 <h2 style="font-size:19px;">Profile</h2>
                </div>
             </div> 
             <dl class="dl">
               <div class="row"><dt>Life context</dt><dd>Grad school / new job</dd></div>
-              <div class="row"><dt>Main destination</dt><dd>Kendall Sq / MIT / Central</dd></div>
+              <div class="row"><dt>Main destination</dt><dd>Kendall Sq / Mit / Central</dd></div>
               <div class="row"><dt>Monthly take-home</dt><dd class="mono">$6,000</dd></div>
               <div class="row"><dt>Comfortable rent</dt><dd class="mono">$1,900–$2,400</dd></div>
               <div class="row"><dt>Apartment type</dt><dd>Studio or 1-bedroom</dd></div>
@@ -139,6 +139,13 @@
               <label class="select-field">
                 <span>Destination</span>
                 <select id="comparePlace"></select>
+              </label>
+              <label class="range-field" id="compareCountField">
+                <span>Options per listing</span>
+                <div class="range-row">
+                  <input id="compareCount" type="range" min="1" max="5" value="3" step="1">
+                  <output id="compareCountValue" for="compareCount">3</output>
+                </div>
               </label>
               <div class="compare-route-list" id="compareRouteList"></div>
             </div>
