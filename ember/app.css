@@ -121,8 +121,7 @@ a{ color:inherit; }
 }
 .flow-copy h1{ font-size:30px; margin-bottom:12px; }
 .flow-copy p:not(.eyebrow){ color:var(--text-2); font-size:14px; max-width:500px; }
-.flow-form{ display:grid; gap:16px; margin-top:26px; }
-.flow-field{ display:flex; flex-direction:column; gap:7px; }
+.flow-form{ display:grid; gap:16px; margin-top:26px;  }
 .flow-field span{ font-size:12px; font-weight:var(--fw-label); color:var(--text-3); }
 .flow-field input{
   width:100%; min-height:44px; border:1px solid var(--border-2); border-radius:var(--r-ctl);
@@ -137,6 +136,12 @@ a{ color:inherit; }
 }
 .flow-form .btn{ justify-self:flex-start; min-width:118px; }
 .thank-card{ text-align:left; }
+#welcome .flow-card{ text-align:center; }
+#welcome .flow-copy p:not(.eyebrow){ margin-left:auto; margin-right:auto; }
+#welcome .flow-field{ text-align:center; }
+#welcome .flow-field input{ text-align:center; }
+#welcome #participantName{ width:min(100%, 300px); }
+#welcome .flow-form .btn{ justify-self:center; }
 
 .vh{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; min-height:42px; margin-bottom:22px; padding-right:300px; flex-wrap:wrap; }
 .eyebrow{ font-size:11px; font-weight:var(--fw-label); letter-spacing:0; color:var(--brand); margin-bottom:8px; }
@@ -388,6 +393,7 @@ a{ color:inherit; }
   color:var(--text); font:500 13px/1.2 'Ubuntu',Arial,Helvetica,sans-serif; padding:11px 12px; }
 .select-field select:focus{ outline:2px solid var(--brand); outline-offset:2px; }
 .range-field{ display:flex; flex-direction:column; gap:8px; transition:opacity .14s; }
+.range-field[hidden]{ display:none; }
 .range-field > span{ font-size:12px; font-weight:var(--fw-label); letter-spacing:0; color:var(--text-3); }
 .range-field.is-disabled{ opacity:.45; }
 .range-row{ display:grid; grid-template-columns:1fr 34px; align-items:center; gap:10px; }
@@ -420,8 +426,7 @@ a{ color:inherit; }
   font-size:13px; font-weight:var(--fw-label); color:#fff; background:linear-gradient(150deg, var(--g1), var(--g2)); }
 .to-ht h4{ font-size:14.5px; font-weight:var(--fw-card-heading); }
 .to-h .pill.soft{ padding:0; border:0; background:transparent; color:var(--text); font-size:14px; font-weight:var(--fw-card-heading); }
-.to-total{ padding:11px 17px; border-bottom:1px solid var(--border); color:var(--text-2); font-size:12.5px; line-height:1.45; }
-.to-scores{ padding:14px 17px 15px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+.to-scores{ padding:14px 17px 15px; border-top:1px solid var(--border); background:var(--surface-2); }
 .to-b{ padding:5px 17px 4px; }
 .tob{ padding:12px 0; border-bottom:1px dashed var(--border-2); }
 .tob:last-child{ border-bottom:none; }

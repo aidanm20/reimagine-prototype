@@ -406,9 +406,9 @@
     {tag:'c',name:'Allston',rent:'$2,400',pos:'Most space & daily-life convenience — grocery, cafés, a livable home.',neg:'Highest true monthly cost; less direct to Kendall / Mit / Central.',fit:'Renters trading budget for comfort & neighborhood life.'},
   ];
   TO.splice(0, TO.length,
-    {tag:'a',name:'East Boston Studio',rent:'$1,975/month advertised',total:'Estimated monthly total: $2,120&ndash;$2,205, plus any unresolved pet or parking costs',pos:'Pet-friendly, renovated, and potentially lower upfront cost than the other options.',neg:'The 281 sqft studio is very small, the commute to Kendall / MIT / Central is less direct, and several costs are still not fully listed.',fit:'You want a pet-friendly, more residential option and can tolerate a longer commute and some cost uncertainty.'},
-    {tag:'b',name:'Cambridge Micro-Studio',rent:'$1,900/month advertised',total:'Estimated monthly total: $1,995&ndash;$2,090 without parking',pos:'Lowest estimated monthly cost and strongest access to Kendall / MIT / Central.',neg:'The 290 sqft studio offers very limited storage and work-from-home space, and approximately $5,700 is required before move-in.',fit:'You prioritize a short commute and lower monthly cost more than living space or lower upfront cost.'},
-    {tag:'c',name:'Allston 1BR',rent:'$2,400/month advertised',total:'Estimated monthly total: $2,490&ndash;$2,590 without parking',pos:'By far the most space, with a separate bedroom, heat and hot water included, and strong access to groceries, caf&eacute;s, transit, dining, and neighborhood activity.',neg:'It has the highest estimated monthly cost, a less direct commute to Kendall / MIT / Central, and approximately $4,800&ndash;$7,200 may be needed before move-in, plus renters insurance.',fit:'You are willing to pay more for a larger, more livable home and stronger neighborhood convenience.'}
+    {tag:'a',name:'East Boston Studio',rent:'$1,975/month advertised',pos:'Pet-friendly, renovated, and potentially lower upfront cost than the other options.',neg:'The 281 sqft studio is very small, the commute to Kendall / MIT / Central is less direct, and several costs are still not fully listed.',fit:'You want a pet-friendly, more residential option and can tolerate a longer commute and some cost uncertainty.'},
+    {tag:'b',name:'Cambridge Micro-Studio',rent:'$1,900/month advertised',pos:'Lowest estimated monthly cost and strongest access to Kendall / MIT / Central.',neg:'The 290 sqft studio offers very limited storage and work-from-home space, and approximately $5,700 is required before move-in.',fit:'You prioritize a short commute and lower monthly cost more than living space or lower upfront cost.'},
+    {tag:'c',name:'Allston 1BR',rent:'$2,400/month advertised',pos:'By far the most space, with a separate bedroom, heat and hot water included, and strong access to groceries, caf&eacute;s, transit, dining, and neighborhood activity.',neg:'It has the highest estimated monthly cost, a less direct commute to Kendall / MIT / Central, and approximately $4,800&ndash;$7,200 may be needed before move-in, plus renters insurance.',fit:'You are willing to pay more for a larger, more livable home and stronger neighborhood convenience.'}
   );
   const toc=document.getElementById('toCards');
   if(toc){
@@ -416,12 +416,11 @@
       const el=document.createElement('div'); el.className='card to';
       el.innerHTML=`
         <div class="to-h"><div class="to-ht"><span class="tag">${tagLabel(o.tag)}</span><h4>${o.name}</h4></div><span class="pill soft">${o.rent}</span></div>
-        <p class="to-total">${o.total}</p>
-        <div class="to-scores">${scoresHTML(o.tag)}</div>
         <div class="to-b">
           <div class="tob pos"><div class="tl"><i></i>Strongest on</div><p>${o.pos}</p></div>
           <div class="tob neg"><div class="tl"><i></i>Watch out</div><p>${o.neg}</p></div>
           <div class="tob fit"><div class="tl"><i></i>Best fit if</div><p>${o.fit}</p></div></div>
+        <div class="to-scores">${scoresHTML(o.tag)}</div>
         `;
       toc.appendChild(el);
     });
