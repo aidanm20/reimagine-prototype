@@ -44,24 +44,44 @@
 
   window.go = function(id){
     const ci=idx(id);
+    const isFlowScreen = ci < 0;
+    document.querySelector('.app').classList.toggle('is-flow', isFlowScreen);
     document.querySelectorAll('.view').forEach(v=>v.classList.toggle('show', v.id===id));
     document.querySelectorAll('.step').forEach((el,i)=>{
-      el.classList.toggle('active', el.dataset.target===id);
-      el.classList.toggle('done', i<ci);
-      el.querySelector('.ic').innerHTML = i<ci ? tick : SVG(STEPS[i].ic,1.8,17);
+      el.classList.toggle('active', !isFlowScreen && el.dataset.target===id);
+      el.classList.toggle('done', !isFlowScreen && i<ci);
+      el.querySelector('.ic').innerHTML = (!isFlowScreen && i<ci) ? tick : SVG(STEPS[i].ic,1.8,17);
     });
+    if(isFlowScreen){
+      window.scrollTo({top:0,behavior:'instant'});
+      return;
+    }
     const pct=Math.round(((ci+1)/STEPS.length)*100);
     document.getElementById('progBar').style.width=pct+'%';
     document.getElementById('progPct').textContent=pct+'%';
     document.getElementById('progStep').textContent=`${ci+1} of ${STEPS.length} steps`;
     const topTitle = document.getElementById('topTitle');
     if(topTitle) topTitle.textContent=STEPS[ci].label;
-    // animate score bars and refresh the map when comparison shows
-    if(id==='v4') requestAnimationFrame(()=>{ animateScores('#fitGlance'); refreshCompareMap(); });
+    if(id==='v4') requestAnimationFrame(refreshCompareMap);
+    if(id==='v5') requestAnimationFrame(()=>animateScores('#toCards'));
     window.scrollTo({top:0,behavior:'instant'});
   };
   function animateScores(scope){
     document.querySelectorAll(`${scope} .st > i`).forEach(i=>{ const w=i.dataset.w; i.style.width='0%'; requestAnimationFrame(()=>{ i.style.width=w; }); });
+  }
+
+  const welcomeForm=document.getElementById('welcomeForm');
+  if(welcomeForm){
+    welcomeForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const name=document.getElementById('participantName').value.trim();
+      if(!name){
+        document.getElementById('participantName').focus();
+        return;
+      }
+      window.participantName=name;
+      go('v2');
+    });
   }
 
   /* ---------------- chip interactivity ---------------- */
@@ -77,7 +97,15 @@
       if(!isOn && max && selected>=max) return;
       chip.classList.toggle('is-on');
     }
+    updateFutureContact();
   });
+
+  function updateFutureContact(){
+    const field=document.getElementById('futureContactField');
+    if(!field) return;
+    const selected=document.querySelector('.chip[data-group="future-review"].is-on');
+    field.classList.toggle('show', !!(selected && selected.dataset.contact==='show'));
+  }
 
   /* =================== DATA =================== */
   const LISTINGS=[
@@ -94,16 +122,53 @@
      rows:[['Amenities','a/c, dishwasher, hardwood',1],['Laundry','On-site',1],['Pet policy','Not listed',0],['Parking','On-site available',1],['Visible fees','May apply',0]],
      dist:'Farther than Cambridge, but more spacious & lifestyle-rich.'},
   ];
+  const LISTING_DETAILS=[
+    {tag:'a',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',feeNote:'Price may not include required fees and charges.',bed:'Studio',bath:'1 bath',size:'281 sqft',
+     snap:'Recently renovated lofted studio with a private entrance, updated kitchen, and refreshed bathroom.',
+     rows:[['Kitchen','Updated; quartz counters',1],['Laundry','Shared on-site',1],['Pets','Cats and dogs allowed',1],['Deposit','$750',1],['Income','Approx. 2.5x rent',1],['Available','Now',1]],
+     detailSections:[
+       {title:'Apartment',items:[['Appliances','Refrigerator; range/oven'],['Kitchen','Updated kitchen; quartz countertops'],['Flooring','Vinyl plank flooring'],['Other features','Private entrance; lofted layout']]},
+       {title:'Building and Rules',items:[['Laundry','Shared on-site laundry'],['Pets','Cats and dogs allowed'],['Parking','Contact property manager for details'],['Utilities','Not specified']]},
+       {title:'Move-In and Approval',items:[['Security deposit','$750'],['Lease term','Contact property manager for details'],['Income requirement','Monthly gross income of approximately 2.5x rent'],['Credit requirement','Minimum credit score of 600'],['Availability','Available now']]}
+     ],
+     confirm:'Additional required, optional, or usage-based fees may apply. Contact the property manager for complete pricing details.'},
+    {tag:'b',name:'Cambridge Micro-Studio',hood:'Cambridge / Inman-Central area',rent:'$1,900',feeNote:'No broker fee advertised.',bed:'Studio',bath:'1 bath',size:'290 sqft',
+     snap:'Very small studio in a central Cambridge location, with convenient access to Central Square, Harvard, MIT, Whole Foods, and the Charles River.',
+     rows:[['Utilities in','Heat, water, hot water',1],['Laundry','Shared basement',1],['Parking','$160/mo available',1],['Broker fee','None advertised',1],['Pets','Approval required',0],['Move-in','First, last, deposit',1]],
+     detailSections:[
+       {title:'Apartment',items:[['Appliances','Refrigerator; oven'],['Cooling','Wall-unit cooling'],['Flooring','Hardwood flooring']]},
+       {title:'Building and Rules',items:[['Laundry','Shared washer and dryer in basement'],['Pets','Pets considered with landlord approval'],['Parking','Off-street backyard parking available for $160/month']]},
+       {title:'Utilities and Fees',items:[['Utilities included','Heat; water; hot water; landscaping'],['Utilities not included','Electricity; internet'],['First month\'s rent','Required'],['Last month\'s rent','Required'],['Security deposit','$1,900'],['Broker fee','No broker fee advertised']]},
+       {title:'Lease and Approval',items:[['Lease term','Not listed'],['Income requirement','Not listed'],['Credit requirement','Not listed']]}
+     ],
+     confirm:'Additional application, pet, or other charges may apply. Confirm all required payments and approval criteria with the landlord.'},
+    {tag:'c',name:'Allston 1BR',hood:'Gardner Street Apartments, Allston',rent:'$2,400',feeNote:'Price may not include required fees and charges.',bed:'1 bed',bath:'1 bath',size:'637 sqft',
+     snap:'Larger one-bedroom apartment in a brick building near Boston University, Green Line B, Star Market, dining, and entertainment.',
+     rows:[['Utilities in','Heat and hot water',1],['Laundry','Shared on-site',1],['Parking','$175/mo if available',1],['Lease','12 months',1],['Offer','1 month free possible',1],['Available','Sep 1, 2026',1]],
+     detailSections:[
+       {title:'Apartment',items:[['Address','75-84 Gardner St, Unit 2B, Allston'],['Appliances','Dishwasher; garbage disposal'],['Cooling','Air conditioning'],['Flooring','Hardwood flooring'],['Kitchen','Eat-in kitchen']]},
+       {title:'Building and Rules',items:[['Building features','Sundeck; 24-hour emergency maintenance'],['Laundry','Shared on-site laundry'],['Pets','Pet-friendly; $75 pet charge listed'],['Parking','Covered or off-street parking available for $175/month, subject to availability']]},
+       {title:'Utilities and Fees',items:[['Utilities included','Heat; hot water'],['Utilities not included','Electricity, internet, and other tenant-paid services not specified'],['First month\'s rent','$2,400 required'],['Last month\'s rent','$2,400 required'],['Security deposit','Up to one month may be required'],['Renters insurance','Required']]},
+       {title:'Lease and Approval',items:[['Lease term','12 months'],['Special offer','One month free on qualifying vacant units; conditions apply'],['Income requirement','Not listed'],['Credit requirement','Not listed'],['Availability','September 1, 2026']]}
+     ],
+     confirm:'Additional required, optional, or variable fees may apply. Confirm the security deposit, pet-charge structure, parking availability, insurance cost, and promotional eligibility with the property manager.'},
+  ];
   const lc=document.getElementById('listingCards');
   if(lc){
-    LISTINGS.forEach(L=>{
-      const confirmed=L.rows.filter(r=>r[2]).length, total=L.rows.length, pct=Math.round(confirmed/total*100);
+    LISTING_DETAILS.forEach(L=>{
       const rows=L.rows.map(r=>`<div class="d"><span class="dk">${r[0]}</span>${r[2]?`<span class="dv">${r[1]}</span>`:`<span class="dv unk">${r[1]}<span class="qmark">?</span></span>`}</div>`).join('');
+      const sections=L.detailSections.map(section=>`
+        <section class="detail-group">
+          <h4>${section.title}</h4>
+          <div class="detail-list">
+            ${section.items.map(item=>`<div class="detail-item"><span>${item[0]}</span><strong>${item[1]}</strong></div>`).join('')}
+          </div>
+        </section>`).join('');
       const el=document.createElement('article');
       el.className='card listing';
       el.innerHTML=`
         <div class="media">${SVG(ICON.home,1.6,30)}
-          <span class="opt">Option ${L.tag}</span>
+          <span class="opt">Option ${L.tag.toUpperCase()}</span>
           <span class="price">${L.rent}<small>/mo</small></span></div>
         <div class="body">
           <h3>${L.name}</h3>
@@ -114,18 +179,14 @@
             <span class="s">${SVG(ICON.size,2,15)}${L.size}</span></div>
           <p class="snap">${L.snap}</p>
           <div class="det">${rows}</div>
-          <div class="meter">
-            <div class="ml"><span>Listing detail confirmed</span><span>${confirmed}/${total}</span></div>
-            <div class="mt"><i style="width:${pct}%"></i></div></div>
-          <label class="acts listing-actions">
-            <span class="sr-only">Choose action for ${L.name}</span>
-            <select aria-label="Choose action for ${L.name}">
-              <option value="" selected>Actions</option>
-              <option value="apply">Apply</option>
-              <option value="review">Review</option>
-              <option value="reject">Reject</option>
-            </select>
-          </label>
+          <details class="listing-more">
+            <summary><span>Full listing details</span>${SVG('<path d="m6 9 6 6 6-6"/>',2,16)}</summary>
+            <div class="listing-detail">
+              <p class="fee-note">${L.feeNote}</p>
+              ${sections}
+              <p class="confirm-note">${L.confirm}</p>
+            </div>
+          </details>
         </div>`;
       lc.appendChild(el);
     });
@@ -139,6 +200,14 @@
      opts:['Quiet & residential','Lively & social','Walkable & convenient','Close to work','Diverse & local','Clean & predictable','Creative / artsy','No preference']},
     {q:'What would make an apartment feel wrong?',hint:'choose up to 2',type:'multi',max:2,
      opts:['Too noisy','Too isolated','Too small','Bad commute','No grocery nearby','Unclear fees','Pricey after extras','Not enough light','Doesn’t feel safe','Too far from friends']},
+    {q:'Will you be living with a pet?',hint:'Pick one.',type:'single',
+     opts:['No pets','One cat','One dog','Multiple cats and/or dogs','Other pet(s)']},
+    {q:'Will you need a parking space?',hint:'Pick one.',type:'single',
+     opts:['No','Yes, regularly','Maybe','Not sure yet']},
+    {q:'Which places would matter most near home?',hint:'choose up to 3',type:'multi',max:3,
+     opts:['Grocery store','Pharmacy','Coffee shop','Gym or fitness studio','Park or outdoor space','Restaurants and bars','Laundry','Transit stop','Work or school','Friends or family','Healthcare','Library or community space']},
+    {q:'How much walking before transit feels acceptable?',hint:'Pick one.',type:'single',
+     opts:['5 minutes or less','6-10 minutes','11-15 minutes','16-20 minutes','More than 20 minutes is okay','Depends on the route']},
     {q:'Which option are you leaning toward — and why?',hint:'open response',type:'text'},
   ];
   function qCard(item,i){
@@ -172,6 +241,7 @@
       `<div class="score"><div class="sl"><span class="sk">${SVG(SCORE_IC[k],2,13)}${k}</span><span class="sv">${v}</span></div><div class="st"><i data-w="${v}%" style="width:${v}%"></i></div></div>`
     ).join('')+'</div>';
   }
+  const tagLabel=tag=>String(tag).toUpperCase();
 
   /* ----- comparison: fit-at-a-glance ----- */
   const HEADS=[
@@ -182,7 +252,7 @@
   const fg=document.getElementById('fitGlance');
   if(fg){
     fg.innerHTML='<div class="fit-grid">'+HEADS.map(h=>
-      `<div class="fit-col"><div class="fc-h"><span class="tag">${h.tag}</span><span class="nm">${h.name}<small>${h.hood} · ${h.rent}/mo</small></span></div>${scoresHTML(h.tag)}</div>`
+      `<div class="fit-col"><div class="fc-h"><span class="tag">${tagLabel(h.tag)}</span><span class="nm">${h.name}<small>${h.hood} · ${h.rent}/mo</small></span></div>${scoresHTML(h.tag)}</div>`
     ).join('')+'</div>';
   }
 
@@ -208,7 +278,7 @@
       return `<div class="cl${you?' you':''}">${inner}</div>`;
     };
     let h=`<div class="ch corner"><span class="sec-label"> Listings</span></div>`;
-    HEADS.forEach(hd=>{ h+=`<div class="ch"><div class="ch-top"><span class="tag">${hd.tag}</span><div><h4>${hd.name}</h4></div></div></div>`; });
+    HEADS.forEach(hd=>{ h+=`<div class="ch"><div class="ch-top"><span class="tag">${tagLabel(hd.tag)}</span><div><h4>${hd.name}</h4></div></div></div>`; });
     CMP.core.forEach(r=>{ h+=`<div class="rl">${r.lab}</div>`+r.v.map(c=>cell(c,false)).join(''); });
     h+=`<div class="seclab you">${star(12)}Your priorities</div>`;
     CMP.you.forEach(r=>{ h+=`<div class="rl you">${star(11)}${r.lab}</div>`+r.v.map(c=>cell(c,true)).join(''); });
@@ -221,16 +291,23 @@
     {tag:'b',name:'Cambridge',rent:'$1,900',pos:'Strongest central access — lowest friction to Kendall / Mit.',neg:'Very small (290 sqft) — tough for storage, wfh, or a sense of home.',fit:'Commute-first renters who travel light.'},
     {tag:'c',name:'Allston',rent:'$2,400',pos:'Most space & daily-life convenience — grocery, cafés, a livable home.',neg:'Highest true monthly cost; less direct to Kendall / Mit / Central.',fit:'Renters trading budget for comfort & neighborhood life.'},
   ];
+  TO.splice(0, TO.length,
+    {tag:'a',name:'East Boston Studio',rent:'$1,975/month advertised',total:'Estimated monthly total: $2,120&ndash;$2,205, plus any unresolved pet or parking costs',pos:'Pet-friendly, renovated, and potentially lower upfront cost than the other options.',neg:'The 281 sqft studio is very small, the commute to Kendall / MIT / Central is less direct, and several costs are still not fully listed.',fit:'You want a pet-friendly, more residential option and can tolerate a longer commute and some cost uncertainty.'},
+    {tag:'b',name:'Cambridge Micro-Studio',rent:'$1,900/month advertised',total:'Estimated monthly total: $1,995&ndash;$2,090 without parking',pos:'Lowest estimated monthly cost and strongest access to Kendall / MIT / Central.',neg:'The 290 sqft studio offers very limited storage and work-from-home space, and approximately $5,700 is required before move-in.',fit:'You prioritize a short commute and lower monthly cost more than living space or lower upfront cost.'},
+    {tag:'c',name:'Allston 1BR',rent:'$2,400/month advertised',total:'Estimated monthly total: $2,490&ndash;$2,590 without parking',pos:'By far the most space, with a separate bedroom, heat and hot water included, and strong access to groceries, caf&eacute;s, transit, dining, and neighborhood activity.',neg:'It has the highest estimated monthly cost, a less direct commute to Kendall / MIT / Central, and approximately $4,800&ndash;$7,200 may be needed before move-in, plus renters insurance.',fit:'You are willing to pay more for a larger, more livable home and stronger neighborhood convenience.'}
+  );
   const toc=document.getElementById('toCards');
   if(toc){
     TO.forEach(o=>{
       const el=document.createElement('div'); el.className='card to';
       el.innerHTML=`
-        <div class="to-h"><div class="to-ht"><span class="tag">${o.tag}</span><h4>${o.name}</h4></div><span class="pill soft">${o.rent}/mo</span></div>
+        <div class="to-h"><div class="to-ht"><span class="tag">${tagLabel(o.tag)}</span><h4>${o.name}</h4></div><span class="pill soft">${o.rent}</span></div>
+        <p class="to-total">${o.total}</p>
+        <div class="to-scores">${scoresHTML(o.tag)}</div>
         <div class="to-b">
           <div class="tob pos"><div class="tl"><i></i>Strongest on</div><p>${o.pos}</p></div>
           <div class="tob neg"><div class="tl"><i></i>Watch out</div><p>${o.neg}</p></div>
-          <div class="tob fit"><div class="tl"><i></i>Fits</div><p>${o.fit}</p></div></div>
+          <div class="tob fit"><div class="tl"><i></i>Best fit if</div><p>${o.fit}</p></div></div>
         `;
       toc.appendChild(el);
     });
@@ -238,41 +315,18 @@
 
   /* ----- decision matrix ----- */
   const DEC=['Apply','Save for later','Reject','Not sure'];
-  const dm=document.getElementById('decMatrix');
-  if(dm){
+  function renderDecisionMatrix(dm, groupPrefix){
+    if(!dm) return;
     [['a','East Boston'],['b','Cambridge'],['c','Allston']].forEach((o,ri)=>{
       const row=document.createElement('div'); row.className='drow';
-      row.innerHTML=`<div class="dopt"><span class="tag">${o[0]}</span>Option ${o[0]} — ${o[1]}</div>
-        <div class="seg">${DEC.map(d=>`<span class="chip radio" data-chip data-group="dec${ri}"><span class="tick">${tick}</span>${d}</span>`).join('')}</div>`;
+      row.innerHTML=`<div class="dopt"><span class="tag">${tagLabel(o[0])}</span>Option ${tagLabel(o[0])} — ${o[1]}</div>
+        <div class="seg">${DEC.map(d=>`<span class="chip radio" data-chip data-group="${groupPrefix}${ri}"><span class="tick">${tick}</span>${d}</span>`).join('')}</div>`;
       dm.appendChild(row);
     });
   }
 
-   
-
-  /* ----- recommendation ----- */
-  const rec=document.getElementById('recCard');
-  if(rec){
-    rec.innerHTML=`
-      <div class="rec-main">
-        <div class="rec-copy">
-          <div class="sec-label">Recommended next step</div>
-          <div class="rec-title"><span class="tag">b</span><h3>Apply to Cambridge first</h3></div>
-          <p>It best matches the stated priorities: shortest commute, lowest listed rent, and the least day-to-day friction for Kendall / Mit. The space trade-off is real, so treat it as the option to move on only if the micro-studio size feels livable in person.</p>
-          <div class="rec-checks">
-            <div class="rec-check"><b>Before applying</b><span>Confirm total monthly cost, utilities, laundry, and any move-in fees.</span></div>
-            <div class="rec-check"><b>Backup plan</b><span>Keep Allston warm if the Cambridge layout feels too small after a tour.</span></div>
-          </div>
-        </div>
-        <div class="rec-side">
-          <div class="rec-score">
-            <div><b>12 min</b><span>commute</span></div>
-            <div><b>$1,900</b><span>listed rent</span></div>
-            <div><b>Low</b><span>daily friction</span></div>
-          </div>
-        </div>
-      </div>`;
-  }
+  renderDecisionMatrix(document.getElementById('decMatrix'), 'dec');
+  renderDecisionMatrix(document.getElementById('decMatrixListings'), 'decListing');
 
   /* ===================== GOOGLE MAPS ===================== */
   const PLACES=[
@@ -394,6 +448,8 @@
     const place=document.getElementById('comparePlace');
     return place&&place.value ? place.value : 'Work';
   }
+  renderDecisionMatrix(document.getElementById('decMatrix'), 'dec');
+  renderDecisionMatrix(document.getElementById('decMatrixListings'), 'decListing');
   function isWorkCompare(){
     return selectedComparePlace()==='Work';
   }
@@ -402,13 +458,13 @@
     return Math.max(1,Math.min(5,Number(count&&count.value) || 3));
   }
   function updateOptionCountControl(){
-    const disabled=isWorkCompare();
+    const hidden=isWorkCompare();
     const count=document.getElementById('compareCount');
     const value=document.getElementById('compareCountValue');
     const field=document.getElementById('compareCountField');
-    if(count) count.disabled=disabled;
-    if(value) value.textContent=disabled ? '1' : String(selectedOptionCount());
-    if(field) field.classList.toggle('is-disabled',disabled);
+    if(count) count.disabled=hidden;
+    if(value) value.textContent=hidden ? '1' : String(selectedOptionCount());
+    if(field) field.hidden=hidden;
   }
   function selectedTravelMode(){
     const mode=document.getElementById('compareMode');
@@ -483,10 +539,10 @@
       return PLACES.map((p,i)=>{
         const targets=Array.isArray(compareState.targets[i]) ? compareState.targets[i] : [];
         if(status && !targets.length){
-          return `<div class="compare-route muted"><span class="tag">${p.tag}</span><div><b>${p.name}</b><small>${status}</small></div></div>`;
+          return `<div class="compare-route muted"><span class="tag">${tagLabel(p.tag)}</span><div><b>${p.name}</b><small>${status}</small></div></div>`;
         }
         const details=targets.length ? targets.map((target,ti)=>`<span>${ti+1}. ${target.name} - ${milesBetween(p,target).toFixed(1)} mi</span>`).join('') : '<span>Nearest places unavailable</span>';
-        return `<div class="compare-route stack"><span class="tag">${p.tag}</span><div><b>${p.name}</b><small>${targets.length} nearest ${selectedComparePlace().toLowerCase()}</small><div class="nearby-options">${details}</div></div></div>`;
+        return `<div class="compare-route stack"><span class="tag">${tagLabel(p.tag)}</span><div><b>${p.name}</b><small>${targets.length} nearest ${selectedComparePlace().toLowerCase()}</small><div class="nearby-options">${details}</div></div></div>`;
       }).join('');
     }
     return PLACES.map((p,i)=>{
@@ -495,7 +551,7 @@
       const targetName=target ? target.name : 'Nearest place';
       const detail=status || (result&&result.detail) || 'Travel time unavailable';
       const cls=result&&result.error?' muted':'';
-      return `<div class="compare-route${cls}"><span class="tag">${p.tag}</span><div><b>${p.name}</b><small>${targetName} - ${detail}</small></div></div>`;
+      return `<div class="compare-route${cls}"><span class="tag">${tagLabel(p.tag)}</span><div><b>${p.name}</b><small>${targetName} - ${detail}</small></div></div>`;
     }).join('');
   }
   function renderCompareRoutes(status){
@@ -605,7 +661,7 @@
     renderCommutes('Calculating transit time...');
     const map=new google.maps.Map(document.getElementById('gmap'),{center:{lat:DEST.lat,lng:DEST.lng},zoom:12,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,gestureHandling:'cooperative',styles:[{featureType:'poi',elementType:'labels',stylers:[{visibility:'off'}]}]});
     const bounds=new google.maps.LatLngBounds(), iw=new google.maps.InfoWindow();
-    PLACES.forEach(p=>{ const m=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'500'},title:p.name}); m.addListener('click',()=>{iw.setContent(infoHTML(`Option ${p.tag} - ${p.name}`,`${p.hood} - ${p.rent}/mo`,commuteLine(p)));iw.open({map,anchor:m});}); bounds.extend(m.getPosition()); });
+    PLACES.forEach(p=>{ const m=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'500'},title:p.name}); m.addListener('click',()=>{iw.setContent(infoHTML(`Option ${p.tag.toUpperCase()} - ${p.name}`,`${p.hood} - ${p.rent}/mo`,commuteLine(p)));iw.open({map,anchor:m});}); bounds.extend(m.getPosition()); });
     const dmk=new google.maps.Marker({position:{lat:DEST.lat,lng:DEST.lng},map,icon:pin('#5b6ee0'),label:{text:'\u2605',color:'#fff',fontSize:'13px',fontWeight:'500'},title:DEST.name}); dmk.addListener('click',()=>{iw.setContent(infoHTML(DEST.name,DEST.hood));iw.open({map,anchor:dmk});}); bounds.extend(dmk.getPosition());
     map.fitBounds(bounds,64);
     loadCommuteTimes();
@@ -690,7 +746,7 @@
     compareState.info=new google.maps.InfoWindow();
     compareState.listingMarkers=PLACES.map(p=>{
       const marker=new google.maps.Marker({position:{lat:p.lat,lng:p.lng},map:compareState.map,icon:pin('#e1582f'),label:{text:p.tag,color:'#fff',fontSize:'12px',fontWeight:'500'},title:p.name});
-      marker.addListener('click',()=>{ compareState.info.setContent(infoHTML(`Option ${p.tag} - ${p.name}`,`${p.hood} - ${p.rent}/mo`)); compareState.info.open({map:compareState.map,anchor:marker}); });
+      marker.addListener('click',()=>{ compareState.info.setContent(infoHTML(`Option ${p.tag.toUpperCase()} - ${p.name}`,`${p.hood} - ${p.rent}/mo`)); compareState.info.open({map:compareState.map,anchor:marker}); });
       return marker;
     });
     updateCompareMap();
@@ -708,5 +764,5 @@
   initCompareControls();
   loadMaps();
 
-  go('v2');
+  go('welcome');
 })();

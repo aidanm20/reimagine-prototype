@@ -10,11 +10,11 @@
 <link rel="stylesheet" href="ember/app.css">
 </head>
 <body>
-<div class="app">
+<div class="app is-flow">
   <!-- ============ SIDEBAR ============ -->
   <aside class="side">
     <div class="brand">
-      <div class="bt">Best current fit</div>
+      <div class="bt">Reimagine Renting</div>
     </div> 
     <nav class="steps" id="steps"></nav>
     <div class="side-foot">
@@ -28,11 +28,30 @@
   <!-- ============ MAIN ============ -->
   <div class="main">
     <div class="content">
-      <div class="account-actions">
-        <button class="btn-ghost"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit profile</button>
-      </div>
+      <!-- ===== WELCOME ===== -->
+      <section class="view flow-screen show" id="welcome">
+        <div class="flow-card">
+          <div class="flow-mark">RR</div>
+          <div class="flow-copy">
+            <p class="eyebrow">Reimagine Renting</p>
+            <h1>Welcome</h1>
+            <p>
+              Hello. We are developing a website that helps people compare apartment listings more clearly.
+              Please enter your name and select Start to continue. By starting, you agree that your responses
+              may be recorded for research and product development purposes.
+            </p>
+          </div>
+          <form class="flow-form" id="welcomeForm">
+            <label class="flow-field">
+              <span>Name</span>
+              <input id="participantName" name="participantName" type="text" autocomplete="name" placeholder="Enter your name" required>
+            </label>
+            <button class="btn primary" type="submit">Start</button>
+          </form>
+        </div>
+      </section>
       <!-- ===== VIEW 1 — LISTINGS ===== -->
-      <section class="view show" id="v2">
+      <section class="view" id="v2">
         <div class="vh">
           <div>
             <h1>Your 3 saved apartments</h1>
@@ -40,13 +59,16 @@
           </div>
         </div>
 
-        <div class="grid g-3" id="listingCards"></div>
-
-        <div class="grid g-2" style="margin-top:18px;align-items:stretch;">
+        <div class="grid g-2" style="align-items:stretch;">
           <!-- profile card (moved from scenario) -->
           <div class="card pad">
             <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
-              <div class="avatar" style="width:52px;height:52px;font-size:18px;">Jd</div>
+              <div class="avatar" style="width:52px;height:52px;" aria-label="Profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M4 21a8 8 0 0 1 16 0"/>
+                </svg>
+              </div>
               <div style="flex:1;">
                 <h2 style="font-size:19px;">Profile</h2>
                </div>
@@ -57,7 +79,6 @@
               <div class="row"><dt>Monthly take-home</dt><dd class="mono">$6,000</dd></div>
               <div class="row"><dt>Comfortable rent</dt><dd class="mono">$1,900–$2,400</dd></div>
               <div class="row"><dt>Apartment type</dt><dd>Studio or 1-bedroom</dd></div>
-              <div class="row"><dt>Prefered Transportation Method</dt><dd>Car</dd></div>
             </dl>
             <div class="callout blue" style="margin-top:16px;">
               <div class="ci"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></div>
@@ -77,6 +98,13 @@
               <span style="font-size:11px;color:var(--text-3);">add a Google Maps key in ember/app.js to enable</span>
             </div>
           </div>
+        </div>
+
+        <div class="grid g-3" id="listingCards" style="margin-top:18px;"></div>
+
+        <div class="card pad" style="margin-top:18px;">
+          <h3 style="font-size:18px;margin-bottom:14px;">After this comparison, what would you do with each option?</h3>
+          <div class="dec" id="decMatrixListings"></div>
         </div>
 
         <div class="footer-nav">
@@ -110,19 +138,6 @@
              
           </div>
         </div>
-
-        <div class="card fit-card" id="fitGlanceCard">
-          <div class="card-h pad" style="padding:18px 22px 16px;border-bottom:1px solid var(--border);">
-            <div>
-              <h3 class="card-t">Fit at a glance</h3>
-              <p class="card-s">Here is how each of your listings scored.</p>
-            </div>
-            
-          </div>
-          <div id="fitGlance"></div>
-        </div>
-
-        
 
         <div class="cmp-wrap"><div class="cmp" id="cmpTable"></div></div>
 
@@ -167,14 +182,12 @@
       <section class="view" id="v5">
         <div class="vh">
           <div>
-            <h1>What each option reveals</h1>
+            <h1>Trade-Off Summary</h1>
           
           </div>
         </div>
 
         <div class="to-grid" id="toCards"></div>
-
-        <div class="card rec-card" id="recCard"></div>
 
         <div class="card pad" style="margin-bottom:18px;">
           <h3 style="font-size:18px;margin-bottom:14px;">After this comparison, what would you do with each option?</h3>
@@ -194,35 +207,83 @@
           </div>
 
           <div class="debrief-form">
+            <div class="dq">
+              <div class="dq-t"><span class="n">1</span>In the comparison page, what affected your decision most?</div>
+              <p class="dq-h">Choose up to three.</p>
+              <div class="seg debrief-options" data-max="3">
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Estimated monthly cost</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Move-in cost</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Commute time and route</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Apartment size and layout</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Neighborhood feeling</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Nearby groceries, cafes, or other daily places</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Parking or pet costs</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Fees or information that still need confirmation</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Lease terms or flexibility</span>
+              </div>
+              <input class="debrief-input" type="text" placeholder="Something else">
+            </div>
+            <div class="dq">
+              <div class="dq-t"><span class="n">2</span>Which parts of the comparison mattered least to you?</div>
+              <p class="dq-h">Choose up to two.</p>
+              <div class="seg debrief-options" data-max="2">
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Monthly cost estimate</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Move-in cost</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Commute information</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Neighborhood and lifestyle fit</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Nearby places and map</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Apartment size</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Questions to ask before applying</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>None - most of the information was useful</span>
+              </div>
+            </div>
+            <div class="dq">
+              <div class="dq-t"><span class="n">3</span>What would you still need to know before applying?</div>
+              <p class="dq-h">Choose up to three.</p>
+              <div class="seg debrief-options" data-max="3">
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Exact total monthly cost</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Exact amount due before move-in</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Utilities and other recurring fees</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Parking availability and cost</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Pet rules and fees</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Application and credit requirements</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Lease renewal or cancellation terms</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Noise and nighttime conditions</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Safety and comfort</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Exact commute at the times I would travel</span>
+                <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>I already have enough information</span>
+              </div>
+              <input class="debrief-input" type="text" placeholder="Something else">
+            </div>
+            <div class="dq">
+              <div class="dq-t"><span class="n">4</span>Would you use a comparison like this after saving apartments on a listing site?</div>
+              <p class="dq-h">Pick one.</p>
+              <div class="seg debrief-options">
+                <span class="chip radio" data-chip data-group="use-comparison"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Definitely</span>
+                <span class="chip radio" data-chip data-group="use-comparison"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Probably</span>
+                <span class="chip radio" data-chip data-group="use-comparison"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Maybe</span>
+                <span class="chip radio" data-chip data-group="use-comparison"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Probably not</span>
+                <span class="chip radio" data-chip data-group="use-comparison"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Definitely not</span>
+              </div>
+            </div>
             <label class="dq">
-              <span class="dq-t"><span class="n">1</span>Which information affected your decision most?</span>
-              <textarea rows="3" placeholder="Type your answer..."></textarea>
-            </label>
-            <label class="dq">
-              <span class="dq-t"><span class="n">2</span>Which information did you ignore?</span>
-              <textarea rows="3" placeholder="Type your answer..."></textarea>
-            </label>
-            <label class="dq">
-              <span class="dq-t"><span class="n">3</span>Did anything feel wrong or mismatched to your priorities?</span>
-              <textarea rows="3" placeholder="Type your answer..."></textarea>
-            </label>
-            <label class="dq">
-              <span class="dq-t"><span class="n">4</span>What would you still want to know before applying?</span>
-              <textarea rows="3" placeholder="Type your answer..."></textarea>
-            </label>
-            <label class="dq">
-              <span class="dq-t"><span class="n">5</span>Would you use a tool like this after finding apartments on a listing site?</span>
+              <span class="dq-t">Optional Feedback</span>
+              <span class="dq-h">Was anything confusing, missing, or especially helpful? Share anything else you would want us to improve.</span>
               <textarea rows="3" placeholder="Type your answer..."></textarea>
             </label>
             <div class="dq">
-              <div class="dq-t"><span class="n">6</span>Preferred format for a tool like this?</div>
+              <div class="dq-t">Join a Future Review</div>
+              <p class="dq-h">Would you be open to reviewing or testing a future version of this tool?</p>
               <div class="seg debrief-options">
-                <span class="chip radio" data-chip data-group="format"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Dashboard</span>
-                <span class="chip radio" data-chip data-group="format"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Chatbot</span>
-                <span class="chip radio" data-chip data-group="format"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Report</span>
-                <span class="chip radio" data-chip data-group="format"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Browser extension</span>
-                <span class="chip radio" data-chip data-group="format"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Something else</span>
+                <span class="chip radio" data-chip data-group="future-review" data-contact="show"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Yes</span>
+                <span class="chip radio" data-chip data-group="future-review" data-contact="show"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Maybe</span>
+                <span class="chip radio" data-chip data-group="future-review"><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>No</span>
               </div>
+              <label class="contact-field" id="futureContactField">
+                <span>Email or preferred contact</span>
+                <input class="debrief-input" type="text" placeholder="Enter your contact information...">
+                <small>Your contact information will only be used to invite you to future research or testing sessions.</small>
+              </label>
             </div>
           </div>
         </div>
@@ -230,7 +291,21 @@
         <div class="footer-nav">
           <button class="btn subtle" onclick="go('v4')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</button>
            
-          <button class="btn primary" onclick="go('v2')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg>Finish &amp; restart</button>
+          <button class="btn primary" onclick="go('thanks')"> Finish</button>
+        </div>
+      </section>
+      <!-- ===== THANK YOU ===== -->
+      <section class="view flow-screen" id="thanks">
+        <div class="flow-card thank-card">
+          <div class="flow-mark">RR</div>
+          <div class="flow-copy">
+            <p class="eyebrow">Complete</p>
+            <h1>Thank you</h1>
+            <p>
+              We appreciate the time and thought you shared with us.
+              Your feedback will help us improve how first-time renters compare real costs, daily-life needs, and housing trade-offs.
+            </p>
+          </div>
         </div>
       </section>
     </div>
