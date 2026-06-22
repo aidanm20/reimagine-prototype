@@ -84,6 +84,120 @@
     });
   }
 
+  function responseSessionId(){
+    const key='rr_session_id';
+    let id=sessionStorage.getItem(key);
+    if(!id){
+      id=(window.crypto&&crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      sessionStorage.setItem(key,id);
+    }
+    return id;
+  }
+
+  function cleanText(value){
+    return String(value || '').replace(/\s+/g,' ').trim();
+  }
+
+  function chipText(chip){
+    return cleanText(chip.textContent);
+  }
+
+  function selectedChipTexts(root){
+    return [...root.querySelectorAll('.chip.is-on')].map(chipText).filter(Boolean);
+  }
+
+  function questionTitle(root){
+    const title=root.querySelector('.q-t,.dq-t');
+    if(!title) return '';
+    const clone=title.cloneNode(true);
+    clone.querySelectorAll('.n').forEach(n=>n.remove());
+    return cleanText(clone.textContent);
+  }
+
+  function collectPriorityAnswers(){
+    return [...document.querySelectorAll('#v3 .q')].map((card,i)=>({
+      index:i+1,
+      question:questionTitle(card),
+      selected:selectedChipTexts(card),
+      text:cleanText((card.querySelector('textarea,input') || {}).value),
+    }));
+  }
+
+  function collectDecisionMatrix(id){
+    const matrix=document.getElementById(id);
+    if(!matrix) return [];
+    return [...matrix.querySelectorAll('.drow')].map(row=>({
+      option:cleanText((row.querySelector('.dopt') || {}).textContent),
+      decision:chipText(row.querySelector('.chip.is-on') || ''),
+    }));
+  }
+
+  function collectDebriefAnswers(){
+    const debrief=document.querySelector('.trade-debrief');
+    if(!debrief) return [];
+    return [...debrief.querySelectorAll('.dq')].map((item,i)=>({
+      index:i+1,
+      question:questionTitle(item) || cleanText((item.querySelector('.dq-t') || {}).textContent),
+      selected:selectedChipTexts(item),
+      text:[...item.querySelectorAll('textarea,input')]
+        .map(input=>cleanText(input.value))
+        .filter(Boolean),
+    }));
+  }
+
+  function collectResponses(){
+    return {
+      participantName:window.participantName || cleanText((document.getElementById('participantName') || {}).value),
+      sessionId:responseSessionId(),
+      submittedAt:new Date().toISOString(),
+      priorities:collectPriorityAnswers(),
+      listingDecisions:collectDecisionMatrix('decMatrixListings'),
+      tradeoffDecisions:collectDecisionMatrix('decMatrix'),
+      comparisonControls:{
+        transportation:(document.getElementById('compareMode') || {}).value || null,
+        destination:(document.getElementById('comparePlace') || {}).value || null,
+        optionsPerListing:(document.getElementById('compareCount') || {}).value || null,
+      },
+      debrief:collectDebriefAnswers(),
+    };
+  }
+
+  async function submitResponses(){
+    const responses=collectResponses();
+    const res=await fetch('/api/responses',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        participant_name:responses.participantName,
+        session_id:responses.sessionId,
+        responses,
+        source:'reimagine-renting',
+      }),
+    });
+    if(!res.ok){
+      const body=await res.json().catch(()=>({}));
+      throw new Error(body.details || body.error || 'Response save failed.');
+    }
+  }
+
+  const finishButton=document.getElementById('finishButton');
+  if(finishButton){
+    finishButton.addEventListener('click',async ()=>{
+      const original=finishButton.textContent;
+      finishButton.disabled=true;
+      finishButton.textContent='Saving...';
+      try{
+        await submitResponses();
+        go('thanks');
+      }catch(error){
+        console.error(error);
+        alert(`Your response could not be saved. ${error.message}`);
+        finishButton.disabled=false;
+        finishButton.textContent=original;
+      }
+    });
+  }
+
   /* ---------------- chip interactivity ---------------- */
   document.addEventListener('click', e=>{
     const chip=e.target.closest('.chip[data-chip]');
@@ -317,6 +431,7 @@
   const DEC=['Apply','Save for later','Reject','Not sure'];
   function renderDecisionMatrix(dm, groupPrefix){
     if(!dm) return;
+    dm.innerHTML='';
     [['a','East Boston'],['b','Cambridge'],['c','Allston']].forEach((o,ri)=>{
       const row=document.createElement('div'); row.className='drow';
       row.innerHTML=`<div class="dopt"><span class="tag">${tagLabel(o[0])}</span>Option ${tagLabel(o[0])} — ${o[1]}</div>
@@ -448,8 +563,6 @@
     const place=document.getElementById('comparePlace');
     return place&&place.value ? place.value : 'Work';
   }
-  renderDecisionMatrix(document.getElementById('decMatrix'), 'dec');
-  renderDecisionMatrix(document.getElementById('decMatrixListings'), 'decListing');
   function isWorkCompare(){
     return selectedComparePlace()==='Work';
   }
