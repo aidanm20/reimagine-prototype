@@ -212,6 +212,7 @@
       chip.classList.toggle('is-on');
     }
     updateFutureContact();
+    renderComparisonTable();
   });
 
   function updateFutureContact(){
@@ -326,6 +327,7 @@
   ];
   function qCard(item,i){
     const el=document.createElement('div'); el.className='card q';
+    el.dataset.qIndex=String(i);
     let chips;
     if(item.type==='text') chips=`<textarea class="input-ph tall q-text" rows="4" placeholder="Type your answer..."></textarea>`;
     else {
@@ -398,6 +400,283 @@
     CMP.you.forEach(r=>{ h+=`<div class="rl you">${star(11)}${r.lab}</div>`+r.v.map(c=>cell(c,true)).join(''); });
     ct.innerHTML=h;
   }
+
+  const COMPARE_DATA={
+    a:{
+      advertised:'$1,975',
+      monthly:{
+        noPetNoParking:'$2,120-$2,205',
+        petNoParking:'$2,120-$2,205 + pet fee TBD',
+        noPetParking:'$2,120-$2,205 + parking TBD',
+        petParking:'$2,120-$2,205 + pet and parking fees TBD',
+      },
+      extras:{
+        noPetNoParking:'$145-$230 over advertised rent',
+        petNoParking:'$145-$230 over advertised rent + pet fee TBD',
+        noPetParking:'$145-$230 over advertised rent + parking TBD',
+        petParking:'$145-$230 over advertised rent + pet and parking fees TBD',
+      },
+      monthlyBreakdown:[
+        ['Advertised rent','$1,975','Listed'],
+        ['Utilities','$120-$180','Estimated'],
+        ['Laundry','$25-$50','Estimated'],
+        ['Parking','Price and availability TBD','Needs confirmation','parking'],
+        ['Pet charge','TBD','Needs confirmation','pet'],
+        ['Unknown charges','TBD','Needs confirmation'],
+      ],
+      uncertainty:'Utilities and laundry are estimated. Parking, pet fees, last month, and required charges still need confirmation.',
+      moveIn:{
+        noPetNoParking:'Plan for $2,725-$4,700',
+        petNoParking:'$2,725-$4,700 + pet fee TBD',
+        noPetParking:'$2,725-$4,700; parking setup cost TBD',
+        petParking:'$2,725-$4,700 + pet and parking setup costs TBD',
+      },
+      moveInBreakdown:[
+        ["First month's rent",'Assume $1,975 for planning','Listed'],
+        ["Last month's rent",'May be required','Needs confirmation'],
+        ['Security deposit','$750','Listed'],
+        ['One-time pet fee','TBD','Needs confirmation','pet'],
+        ['Renters insurance','Not listed','Needs confirmation'],
+        ['Other fees','TBD','Needs confirmation'],
+      ],
+      commute:'Longer and less direct trip to Work / Kendall / MIT / Central.',
+      questions:[
+        "The listing shows a $750 security deposit. Are first and last month's rent also due, and what is the total due at signing?",
+        'Which utilities are included in the $1,975 rent?',
+        'Is parking available for this unit, and what does it cost?',
+        'What required charges are included under "fees may apply"?',
+      ],
+    },
+    b:{
+      advertised:'$1,900',
+      monthly:{
+        noPetNoParking:'$1,995-$2,090',
+        petNoParking:'$1,995-$2,090 + pet fee TBD',
+        noPetParking:'$2,155-$2,250',
+        petParking:'$2,155-$2,250 + pet fee TBD',
+      },
+      extras:{
+        noPetNoParking:'$95-$190 over advertised rent',
+        petNoParking:'$95-$190 over advertised rent + pet fee TBD',
+        noPetParking:'$255-$350 over advertised rent',
+        petParking:'$255-$350 over advertised rent + pet fee TBD',
+      },
+      monthlyBreakdown:[
+        ['Advertised rent','$1,900','Listed'],
+        ['Utilities','$70-$140','Estimated'],
+        ['Laundry','$25-$50','Estimated'],
+        ['Parking','$160/month','Based on your needs','parking'],
+        ['Pet charge','TBD','Needs confirmation','pet'],
+        ['Unknown charges','TBD','Needs confirmation'],
+      ],
+      uncertainty:'Electricity, internet, laundry, pet fees, approval rules, and documentation requirements still need confirmation.',
+      moveIn:{
+        noPetNoParking:'$5,700',
+        petNoParking:'$5,700 + pet fee TBD',
+        noPetParking:'$5,700',
+        petParking:'$5,700 + pet fee TBD',
+      },
+      moveInBreakdown:[
+        ["First month's rent",'$1,900','Listed'],
+        ["Last month's rent",'$1,900','Listed'],
+        ['Security deposit','$1,900','Listed'],
+        ['One-time pet fee','TBD','Needs confirmation','pet'],
+        ['Renters insurance','Not listed','Needs confirmation'],
+        ['Other fees','TBD','Needs confirmation'],
+      ],
+      commute:'Closest and most direct trip to Work / Kendall / MIT / Central.',
+      bestMonthly:1,
+      bestCommute:1,
+      questions:[
+        'Are any charges due beyond the confirmed $5,700?',
+        'What income, credit, guarantor, and documentation requirements apply?',
+        'What has the typical monthly electricity cost been for this unit?',
+        'What are the pet approval rules and fees?',
+      ],
+    },
+    c:{
+      advertised:'$2,400',
+      monthly:{
+        noPetNoParking:'$2,490-$2,590',
+        petNoParking:'$2,490-$2,590',
+        noPetParking:'$2,665-$2,765',
+        petParking:'$2,665-$2,765',
+      },
+      extras:{
+        noPetNoParking:'$90-$190 over advertised rent',
+        petNoParking:'$90-$190 over advertised rent; $75 one-time pet fee',
+        noPetParking:'$265-$365 over advertised rent',
+        petParking:'$265-$365 over advertised rent; $75 one-time pet fee',
+      },
+      monthlyBreakdown:[
+        ['Advertised rent','$2,400','Listed'],
+        ['Utilities','$70-$140','Estimated'],
+        ['Laundry','$20-$50','Estimated'],
+        ['Parking','$175/month','Based on your needs','parking'],
+        ['Pet charge','$75 one time; no monthly add','Based on your needs','pet'],
+        ['Unknown charges','TBD','Needs confirmation'],
+      ],
+      uncertainty:'Security deposit, promotion eligibility, insurance price, tenant-paid utilities, and parking availability still need confirmation.',
+      moveIn:{
+        noPetNoParking:'$4,800-$7,200',
+        petNoParking:'$4,875-$7,275',
+        noPetParking:'$4,800-$7,200',
+        petParking:'$4,875-$7,275',
+      },
+      moveInBreakdown:[
+        ["First month's rent",'$2,400','Listed'],
+        ["Last month's rent",'$2,400','Listed'],
+        ['Security deposit','$0-$2,400','Needs confirmation'],
+        ['One-time pet fee','$75','Based on your needs','pet'],
+        ['Renters insurance','Required; amount TBD','Needs confirmation'],
+        ['Other fees','TBD','Needs confirmation'],
+      ],
+      commute:'Manageable, but less direct than Cambridge.',
+      questions:[
+        'Is the additional one-month security deposit required for Unit 2B?',
+        'Does the one-month-free offer apply to Unit 2B, and how is the credit applied?',
+        'Which utilities beyond heat and hot water are billed to the tenant?',
+        'What renters-insurance coverage is required?',
+      ],
+    },
+  };
+  const PRIORITY_OUTPUTS={
+    'Short commute':{
+      a:['Potential trade-off','Longer and less direct trip.'],
+      b:['Strong match','Closest and most direct.'],
+      c:['Possible match','Manageable but less direct than B.'],
+    },
+    'Quiet environment':{
+      a:['Possible match','More residential; verify street and aircraft noise.'],
+      b:['Potential trade-off','Central location may feel busy.'],
+      c:['Mixed fit','Quiet side street, but lively wider neighborhood.'],
+    },
+    'Safety / comfort':{
+      a:['Needs confirmation','Check nighttime transit route and private entrance.'],
+      b:['Possible match','Central access, but nighttime conditions still need checking.'],
+      c:['Needs confirmation','Check the nighttime walk from Green Line B.'],
+    },
+    'Lower total cost':{
+      a:['Possible match','Second-lowest estimate, with several unknown costs.'],
+      b:['Strong match','Lowest estimated monthly total.'],
+      c:['Potential trade-off','Highest estimated monthly total.'],
+    },
+    'Social / lively':{
+      a:['Potential trade-off','More residential.'],
+      b:['Strong match','Central cafes, restaurants, and urban activity.'],
+      c:['Strong match','Strong student, dining, cafe, and music context.'],
+    },
+    'Flexibility':{
+      a:['Needs confirmation','Lease term is not listed.'],
+      b:['Needs confirmation','Lease and renewal terms are not listed.'],
+      c:['Potential trade-off','Fixed 12-month lease.'],
+    },
+    'Daily convenience':{
+      a:['Possible match','Local services, but less connected to the main routine.'],
+      b:['Strong match','Strong central access to everyday services.'],
+      c:['Strong match','Grocery, transit, dining, and entertainment nearby.'],
+    },
+    'Larger space':{
+      a:['Potential trade-off','281 sqft studio.'],
+      b:['Potential trade-off','290 sqft micro-studio.'],
+      c:['Strong match','637 sqft with a separate bedroom.'],
+    },
+    'Lower upfront cost':{
+      a:['Possible match','Lower planning range, but requirements are unclear.'],
+      b:['Potential trade-off','Approximately $5,700 required.'],
+      c:['Potential trade-off','Approximately $4,800-$7,200 plus insurance.'],
+    },
+  };
+  function selectedQuestionTexts(index){
+    const card=document.querySelector(`#v3 .q[data-q-index="${index}"]`);
+    return card ? selectedChipTexts(card) : [];
+  }
+  function hasPet(){
+    const selected=selectedQuestionTexts(3)[0] || 'No pets';
+    return selected !== 'No pets';
+  }
+  function parkingState(){
+    const selected=selectedQuestionTexts(4)[0] || 'No';
+    if(selected === 'Yes, regularly') return 'yes';
+    if(selected === 'Maybe' || selected === 'Not sure yet') return 'maybe';
+    return 'no';
+  }
+  function totalKey(){
+    const pet=hasPet();
+    const parking=parkingState();
+    if(parking === 'yes') return pet ? 'petParking' : 'noPetParking';
+    return pet ? 'petNoParking' : 'noPetNoParking';
+  }
+  function selectedPriorities(){
+    const selected=selectedQuestionTexts(0).filter(p=>PRIORITY_OUTPUTS[p]).slice(0,2);
+    return selected.length ? selected : ['Lower total cost','Short commute'];
+  }
+  function maybeTotal(data, type){
+    const pet=hasPet();
+    const without=pet ? 'petNoParking' : 'noPetNoParking';
+    const withParking=pet ? 'petParking' : 'noPetParking';
+    if(parkingState() !== 'maybe') return data[type][totalKey()];
+    return `No parking: ${data[type][without]}<br>With parking: ${data[type][withParking]}`;
+  }
+  function breakdownHTML(items){
+    const pet=hasPet();
+    const parking=parkingState();
+    return `<dl class="cmp-breakdown">${items.map(([label,value,status,condition])=>{
+      if(condition === 'pet' && !pet) return '';
+      if(condition === 'parking' && parking === 'no') return '';
+      return `<div><dt>${label}</dt><dd><strong>${value}</strong><span>${status}</span></dd></div>`;
+    }).join('')}</dl>`;
+  }
+  function detailHTML(summary, items){
+    return `<details class="cmp-more"><summary>${summary}</summary>${breakdownHTML(items)}</details>`;
+  }
+  function valueCell(text, opts={}){
+    const cls=['cl'];
+    if(opts.you) cls.push('you');
+    if(opts.questions) cls.push('questions');
+    const body=opts.unk ? `<span class="unk">${text}<span class="qmark">?</span></span>`
+      : opts.best ? `<span class="best">${SVG(ICON.target,2.4,12)}${text}</span>` : text;
+    return `<div class="${cls.join(' ')}">${body}${opts.detail || ''}</div>`;
+  }
+  function renderComparisonTable(){
+    const table=document.getElementById('cmpTable');
+    if(!table) return;
+    const priorities=selectedPriorities();
+    const priorityText=document.getElementById('comparisonPriorities');
+    if(priorityText) priorityText.textContent=`You told us you care most about: ${priorities.join(' - ')}`;
+    let h=`<div class="ch corner"><span class="sec-label">Comparison table</span></div>`;
+    HEADS.forEach(hd=>{ h+=`<div class="ch"><div class="ch-top"><span class="tag">${tagLabel(hd.tag)}</span><div><h4>${hd.name}</h4><small>${hd.hood} - ${hd.rent}/mo</small></div></div></div>`; });
+    h+=`<div class="rl">Advertised rent</div>`+HEADS.map(hd=>valueCell(COMPARE_DATA[hd.tag].advertised,{best:hd.tag==='b'})).join('');
+    h+=`<div class="rl">Estimated monthly total</div>`+HEADS.map(hd=>{
+      const data=COMPARE_DATA[hd.tag];
+      return valueCell(maybeTotal(data,'monthly'),{
+        best:parkingState() !== 'maybe' && data.bestMonthly,
+        detail:detailHTML('See estimate', data.monthlyBreakdown),
+      });
+    }).join('');
+    h+=`<div class="rl">Estimated extras</div>`+HEADS.map(hd=>valueCell(maybeTotal(COMPARE_DATA[hd.tag],'extras'),{unk:hd.tag==='a' || (hd.tag==='b' && hasPet())})).join('');
+    h+=`<div class="rl">What may still change this total</div>`+HEADS.map(hd=>valueCell(COMPARE_DATA[hd.tag].uncertainty,{unk:1})).join('');
+    h+=`<div class="rl">Cash to have ready before moving in</div>`+HEADS.map(hd=>{
+      const data=COMPARE_DATA[hd.tag];
+      return valueCell(maybeTotal(data,'moveIn'),{
+        detail:detailHTML('See move-in estimate', data.moveInBreakdown),
+      });
+    }).join('');
+    h+=`<div class="rl">Getting to Work / Kendall / MIT / Central</div>`+HEADS.map(hd=>valueCell(COMPARE_DATA[hd.tag].commute,{best:COMPARE_DATA[hd.tag].bestCommute})).join('');
+    h+=`<div class="seclab you">${star(12)}Based on what matters to you</div>`;
+    priorities.forEach(priority=>{
+      h+=`<div class="rl you">${star(11)}${priority}</div>`+HEADS.map(hd=>{
+        const [label,reason]=PRIORITY_OUTPUTS[priority][hd.tag];
+        const best=label === 'Strong match';
+        const unk=label === 'Needs confirmation';
+        return valueCell(`<b>${label}</b><span class="cmp-reason">${reason}</span>`,{you:1,best,unk});
+      }).join('');
+    });
+    h+=`<div class="seclab">What this listing still does not tell you</div>`;
+    h+=`<div class="rl">Questions to confirm</div>`+HEADS.map(hd=>valueCell(`<ol>${COMPARE_DATA[hd.tag].questions.map(q=>`<li>${q}</li>`).join('')}</ol>`,{questions:1})).join('');
+    table.innerHTML=h;
+  }
+  renderComparisonTable();
 
   /* ----- trade-offs ----- */
   const TO=[
