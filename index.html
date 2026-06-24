@@ -50,7 +50,7 @@
           </div>
           <form class="flow-form" id="welcomeForm">
             <label class="flow-field"> 
-              <input id="participantName" name="participantName" type="text" autocomplete="name" placeholder="Enter your name" required>
+              <input id="participantName" name="participantName" type="text" autocomplete="name" placeholder="Enter your name" maxlength="100" required>
             </label>
             <button class="btn primary" type="submit">Let's start</button>
           </form>
@@ -228,7 +228,7 @@
                 <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Fees or information that still need confirmation</span>
                 <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Lease terms or flexibility</span>
               </div>
-              <input class="debrief-input" type="text" placeholder="Something else">
+              <input class="debrief-input" type="text" placeholder="Something else" maxlength="500">
             </div>
             <div class="dq">
               <div class="dq-t"><span class="n">2</span>Which parts of the comparison mattered least to you?</div>
@@ -260,7 +260,7 @@
                 <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>Exact commute at the times I would travel</span>
                 <span class="chip" data-chip><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>I already have enough information</span>
               </div>
-              <input class="debrief-input" type="text" placeholder="Something else">
+              <input class="debrief-input" type="text" placeholder="Something else" maxlength="500">
             </div>
             <div class="dq">
               <div class="dq-t"><span class="n">4</span>Would you use a comparison like this after saving apartments on a listing site?</div>
@@ -276,7 +276,7 @@
             <label class="dq">
               <span class="dq-t">Optional Feedback</span>
               <span class="dq-h">Was anything confusing, missing, or especially helpful? Share anything else you would want us to improve.</span>
-              <textarea rows="3" placeholder="Type your answer..."></textarea>
+              <textarea rows="3" placeholder="Type your answer..." maxlength="2000"></textarea>
             </label>
             <div class="dq">
               <div class="dq-t">Join a Future Review</div>
@@ -288,7 +288,7 @@
               </div>
               <label class="contact-field" id="futureContactField">
                 <span>Email or preferred contact</span>
-                <input class="debrief-input" type="text" placeholder="Enter your contact information...">
+                <input class="debrief-input" type="text" placeholder="Enter your contact information..." maxlength="200">
                 <small>Your contact information will only be used to invite you to future research or testing sessions.</small>
               </label>
             </div>

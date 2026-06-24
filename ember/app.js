@@ -86,10 +86,19 @@
 
   function responseSessionId(){
     const key='rr_session_id';
-    let id=sessionStorage.getItem(key);
+    let id;
+    try{
+      id=sessionStorage.getItem(key);
+    }catch(error){
+      id=null;
+    }
     if(!id){
-      id=(window.crypto&&crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-      sessionStorage.setItem(key,id);
+      id=(window.crypto&&window.crypto.randomUUID) ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      try{
+        sessionStorage.setItem(key,id);
+      }catch(error){
+        // Some browsers/privacy modes block session storage. A per-submit id is still usable.
+      }
     }
     return id;
   }
@@ -172,11 +181,17 @@
         session_id:responses.sessionId,
         responses,
         source:'reimagine-renting',
+        browser:{
+          userAgent:navigator.userAgent,
+          language:navigator.language,
+          online:navigator.onLine,
+        },
       }),
     });
     if(!res.ok){
       const body=await res.json().catch(()=>({}));
-      throw new Error(body.details || body.error || 'Response save failed.');
+      const message=body.details || body.error || 'Response save failed.';
+      throw new Error(`${message} (HTTP ${res.status})`);
     }
   }
 
@@ -329,7 +344,7 @@
     const el=document.createElement('div'); el.className='card q';
     el.dataset.qIndex=String(i);
     let chips;
-    if(item.type==='text') chips=`<textarea class="input-ph tall q-text" rows="4" placeholder="Type your answer..."></textarea>`;
+    if(item.type==='text') chips=`<textarea class="input-ph tall q-text" rows="4" placeholder="Type your answer..." maxlength="2000"></textarea>`;
     else {
       const single=item.type==='single';
       const maxAttr=item.max?` data-max="${item.max}"`:'';

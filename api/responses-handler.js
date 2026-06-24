@@ -43,7 +43,9 @@ function readJson(req) {
     req.on('data', chunk => {
       raw += chunk;
       if (raw.length > 1_000_000) {
-        reject(new Error('Request body is too large.'));
+        const error = new Error('Request body is too large.');
+        error.statusCode = 413;
+        reject(error);
         req.destroy();
       }
     });
@@ -89,6 +91,10 @@ async function handleResponseSubmit(req, res) {
   try {
     payload = await readJson(req);
   } catch (error) {
+    if (error && error.statusCode === 413) {
+      send(res, 413, { error: 'Request body is too large.' });
+      return;
+    }
     send(res, 400, { error: 'Invalid JSON payload.' });
     return;
   }
@@ -99,10 +105,15 @@ async function handleResponseSubmit(req, res) {
     return;
   }
 
+  const responseData = {
+    ...responses,
+    clientContext: payload.browser && typeof payload.browser === 'object' ? payload.browser : null,
+  };
+
   const row = {
     participant_name: String(payload.participant_name || '').trim() || null,
     session_id: String(payload.session_id || crypto.randomUUID()),
-    responses,
+    responses: responseData,
     source: payload.source || 'reimagine-renting',
     user_agent: req.headers['user-agent'] || null,
   };
