@@ -254,6 +254,7 @@
   ];
   const LISTING_DETAILS=[
     {tag:'a',name:'East Boston Studio',hood:'East Boston',rent:'$1,975',feeNote:'Price may not include required fees and charges.',bed:'Studio',bath:'1 bath',size:'281 sqft',
+     image:'images/gove/404689bc506eb88ab5fe829279ed4f1b-cc_ft_1152.webp',imageAlt:'East Boston studio listing photo',
      snap:'Recently renovated lofted studio with a private entrance, updated kitchen, and refreshed bathroom.',
      rows:[['Kitchen','Updated; quartz counters',1],['Laundry','Shared on-site',1],['Pets','Cats and dogs allowed',1],['Deposit','$750',1],['Income','Approx. 2.5x rent',1],['Available','Now',1]],
      detailSections:[
@@ -263,6 +264,7 @@
      ],
      confirm:'Additional required, optional, or usage-based fees may apply. Contact the property manager for complete pricing details.'},
     {tag:'b',name:'Cambridge Micro-Studio',hood:'Cambridge / Inman-Central area',rent:'$1,900',feeNote:'No broker fee advertised.',bed:'Studio',bath:'1 bath',size:'290 sqft',
+     image:'images/inman/a124b894ecb12db5b7d5a5ea8b87db18-cc_ft_1152.webp',imageAlt:'Cambridge micro-studio listing photo',
      snap:'Very small studio in a central Cambridge location, with convenient access to Central Square, Harvard, MIT, Whole Foods, and the Charles River.',
      rows:[['Utilities in','Heat, water, hot water',1],['Laundry','Shared basement',1],['Parking','$160/mo available',1],['Broker fee','None advertised',1],['Pets','Approval required',0],['Move-in','First, last, deposit',1]],
      detailSections:[
@@ -273,6 +275,7 @@
      ],
      confirm:'Additional application, pet, or other charges may apply. Confirm all required payments and approval criteria with the landlord.'},
     {tag:'c',name:'Allston 1BR',hood:'Gardner Street Apartments, Allston',rent:'$2,400',feeNote:'Price may not include required fees and charges.',bed:'1 bed',bath:'1 bath',size:'637 sqft',
+     image:'images/gardner/e1a9418b1123bc219e07f41d8b589c4d-cc_ft_1152.webp',imageAlt:'Allston one-bedroom listing photo',
      snap:'Larger one-bedroom apartment in a brick building near Boston University, Green Line B, Star Market, dining, and entertainment.',
      rows:[['Utilities in','Heat and hot water',1],['Laundry','Shared on-site',1],['Parking','$175/mo if available',1],['Lease','12 months',1],['Offer','1 month free possible',1],['Available','Sep 1, 2026',1]],
      detailSections:[
@@ -297,7 +300,7 @@
       const el=document.createElement('article');
       el.className='card listing';
       el.innerHTML=`
-        <div class="media">${SVG(ICON.home,1.6,30)}
+        <div class="media"><img src="${L.image}" alt="${L.imageAlt}" loading="lazy" decoding="async">
           <span class="opt">Option ${L.tag.toUpperCase()}</span>
           <span class="price">${L.rent}<small>/mo</small></span></div>
         <div class="body">
@@ -665,7 +668,6 @@
     h+=`<div class="rl">Estimated monthly total</div>`+HEADS.map(hd=>{
       const data=COMPARE_DATA[hd.tag];
       return valueCell(maybeTotal(data,'monthly'),{
-        best:parkingState() !== 'maybe' && data.bestMonthly,
         detail:detailHTML('See estimate', data.monthlyBreakdown),
       });
     }).join('');
